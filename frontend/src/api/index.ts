@@ -109,3 +109,30 @@ export const roleAPI = {
   update: (id: number, data: any) => api.put(`/roles/${id}`, data),
   delete: (id: number) => api.delete(`/roles/${id}`),
 };
+
+// Staff Role Mapping API
+export const staffRoleMapAPI = {
+  getAll: () => api.get('/staff-role-map'),
+  getById: (id: number) => api.get(`/staff-role-map/${id}`),
+  create: (data: any) => api.post('/staff-role-map', data),
+  update: (id: number, data: any) => api.put(`/staff-role-map/${id}`, data),
+  delete: (id: number) => api.delete(`/staff-role-map/${id}`),
+};
+
+// Student Role Mapping API
+export const studentRoleMapAPI = {
+  getAll: () => api.get('/student-role-map'),
+  getById: (id: number) => api.get(`/student-role-map/${id}`),
+  create: (data: any) => api.post('/student-role-map', data),
+  update: (id: number, data: any) => api.put(`/student-role-map/${id}`, data),
+  delete: (id: number) => api.delete(`/student-role-map/${id}`),
+};
+
+// Teacher Subject Mapping API
+export const teacherSubjectMapAPI = {
+  getAll: () => api.get('/teacher-subject-map'),
+  getById: (id: number) => api.get(`/teacher-subject-map/${id}`),
+  create: (data: any) => api.post('/teacher-subject-map', data),
+  update: (id: number, data: any) => api.put(`/teacher-subject-map/${id}`, data),
+  delete: (id: number) => api.delete(`/teacher-subject-map/${id}`),
+};

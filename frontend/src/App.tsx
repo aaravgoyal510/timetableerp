@@ -13,6 +13,9 @@ import { Attendance } from './pages/Attendance';
 import { RoomAllotment } from './pages/RoomAllotment';
 import { Holidays } from './pages/Holidays';
 import { Roles } from './pages/Roles';
+import { StaffRoleMap } from './pages/StaffRoleMap';
+import { StudentRoleMap } from './pages/StudentRoleMap';
+import { TeacherSubjectMap } from './pages/TeacherSubjectMap';
 import './index.css';
 
 function App() {
@@ -34,6 +37,9 @@ function App() {
             <Route path="/room-allotment" element={<RoomAllotment />} />
             <Route path="/holidays" element={<Holidays />} />
             <Route path="/roles" element={<Roles />} />
+            <Route path="/staff-role-map" element={<StaffRoleMap />} />
+            <Route path="/student-role-map" element={<StudentRoleMap />} />
+            <Route path="/teacher-subject-map" element={<TeacherSubjectMap />} />
           </Routes>
         </main>
       </div>

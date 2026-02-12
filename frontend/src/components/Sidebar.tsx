@@ -20,6 +20,9 @@ const navigation: Navigation[] = [
   { name: 'Room Allotment', href: '/room-allotment', icon: '🔑' },
   { name: 'Holidays', href: '/holidays', icon: '🎉' },
   { name: 'Roles', href: '/roles', icon: '👥' },
+  { name: 'Staff Roles', href: '/staff-role-map', icon: '🎓' },
+  { name: 'Student Roles', href: '/student-role-map', icon: '📋' },
+  { name: 'Teacher Subjects', href: '/teacher-subject-map', icon: '📖' },
 ];
 
 export const Sidebar: React.FC = () => {

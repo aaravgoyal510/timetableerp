@@ -5,7 +5,7 @@ const cors = require('cors');
 // Import routes
 let studentRoutes, staffRoutes, classRoutes, subjectRoutes, timeslotRoutes, 
     roomRoutes, timetableRoutes, attendanceRoutes, roomAllotmentRoutes, 
-    holidayRoutes, roleRoutes;
+    holidayRoutes, roleRoutes, staffRoleMapRoutes, studentRoleMapRoutes, teacherSubjectMapRoutes;
 
 try {
   studentRoutes = require('./routes/students');
@@ -19,6 +19,9 @@ try {
   roomAllotmentRoutes = require('./routes/roomAllotment');
   holidayRoutes = require('./routes/holidays');
   roleRoutes = require('./routes/roles');
+  staffRoleMapRoutes = require('./routes/staffRoleMap');
+  studentRoleMapRoutes = require('./routes/studentRoleMap');
+  teacherSubjectMapRoutes = require('./routes/teacherSubjectMap');
 } catch (err) {
   console.error('Error loading routes:', err.message);
 }
@@ -47,6 +50,9 @@ app.use('/api/attendance', attendanceRoutes);
 app.use('/api/room-allotment', roomAllotmentRoutes);
 app.use('/api/holidays', holidayRoutes);
 app.use('/api/roles', roleRoutes);
+app.use('/api/staff-role-map', staffRoleMapRoutes);
+app.use('/api/student-role-map', studentRoleMapRoutes);
+app.use('/api/teacher-subject-map', teacherSubjectMapRoutes);
 
 // Error handling
 app.use((err, req, res, next) => {
