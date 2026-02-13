@@ -32,7 +32,7 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children, requir
         <div className="flex items-center justify-center min-h-screen">
           <div className="text-center">
             <h1 className="font-serif text-3xl font-bold text-[var(--ink)] mb-4">Access Denied</h1>
-            <p className="text-[var(--muted)] mb-4">You don't have permission to access this page.</p>
+            <p className="text-[var(--muted)] mb-4">You don&apos;t have permission to access this page.</p>
             <p className="text-sm text-[var(--muted)]">Required roles: {requiredRoles.join(', ')}</p>
           </div>
         </div>
