@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { classesAPI } from '../api';
-import { Plus, Trash2, Users } from 'lucide-react';
+import { Trash2, Users } from 'lucide-react';
 
 interface Class {
   class_id: number;

@@ -40,7 +40,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
           </div>
           <div className="flex items-center gap-4">
             <div className="bg-white/20 backdrop-blur-sm px-4 py-2 rounded-lg">
-              <span className="font-medium">{staff?.name || 'User'}</span>
+              <span className="font-medium">{staff?.staff_name || 'User'}</span>
             </div>
             <button
               onClick={handleLogout}

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { roomAllotmentAPI, roomsAPI, classesAPI, staffAPI, subjectsAPI, timeslotAPI } from '../api';
+import { roomAllotmentAPI, roomsAPI as roomAPI, classesAPI as classAPI, staffAPI, subjectsAPI as subjectAPI, timeslotAPI } from '../api';
 import type { Room, Class, Staff, Subject, Timeslot } from '../types';
 
 interface RoomAllotment {

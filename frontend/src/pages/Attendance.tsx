@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { attendanceAPI, studentsAPI, classesAPI, subjectsAPI, staffAPI, timeslotAPI } from '../api';
+import { attendanceAPI, studentsAPI as studentAPI, classesAPI as classAPI, subjectsAPI as subjectAPI, staffAPI, timeslotAPI } from '../api';
 import type { Student, Class, Subject, Staff, Timeslot } from '../types';
 
 interface Attendance {

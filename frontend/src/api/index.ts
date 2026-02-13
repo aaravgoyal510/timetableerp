@@ -1,18 +1,7 @@
 import axios from 'axios';
 import type {
-  Student,
-  Staff,
-  Class,
-  Subject,
   Timeslot,
-  Room,
-  Timetable,
-  Attendance,
   RoomAllotment,
-  Department,
-  StaffDeptMap,
-  StaffAvailability,
-  Holiday,
   Role,
   StaffRoleMap,
   StudentRoleMap,
@@ -170,6 +159,7 @@ export const staffAPI = {
   getById: (id: number) => api.get(`/staff/${id}`),
   create: (data: any) => api.post('/staff', data),
   update: (id: number, data: any) => api.put(`/staff/${id}`, data),
+  delete: (id: number) => api.delete(`/staff/${id}`),
 };
 
 // ============================================
@@ -180,6 +170,7 @@ export const classesAPI = {
   getById: (id: number) => api.get(`/classes/${id}`),
   create: (data: any) => api.post('/classes', data),
   update: (id: number, data: any) => api.put(`/classes/${id}`, data),
+  delete: (id: number) => api.delete(`/classes/${id}`),
 };
 
 // ============================================
@@ -191,6 +182,7 @@ export const subjectsAPI = {
   getById: (id: number) => api.get(`/subjects/${id}`),
   create: (data: any) => api.post('/subjects', data),
   update: (id: number, data: any) => api.put(`/subjects/${id}`, data),
+  delete: (code: string | number) => api.delete(`/subjects/${code}`),
 };
 
 // ============================================
@@ -202,6 +194,7 @@ export const timetableAPI = {
   getById: (id: number) => api.get(`/timetable/${id}`),
   create: (data: any) => api.post('/timetable', data),
   update: (id: number, data: any) => api.put(`/timetable/${id}`, data),
+  delete: (id: number) => api.delete(`/timetable/${id}`),
 };
 
 // ============================================
@@ -210,9 +203,11 @@ export const timetableAPI = {
 export const attendanceAPI = {
   getAll: (studentId?: number, classId?: number, subjectId?: number, date?: string) =>
     api.get('/attendance', { params: { student_id: studentId, class_id: classId, subject_id: subjectId, attendance_date: date } }),
+  create: (data: any) => api.post('/attendance', data),
   mark: (data: any) => api.post('/attendance/mark', data),
   getReports: (studentId?: number, academicYear?: string) =>
     api.get('/attendance/reports', { params: { student_id: studentId, academic_year: academicYear } }),
+  delete: (id: number) => api.delete(`/attendance/${id}`),
 };
 
 // ============================================
@@ -224,6 +219,7 @@ export const roomsAPI = {
   getById: (id: number) => api.get(`/rooms/${id}`),
   create: (data: any) => api.post('/rooms', data),
   update: (id: number, data: any) => api.put(`/rooms/${id}`, data),
+  delete: (id: number) => api.delete(`/rooms/${id}`),
 };
 
 // ============================================
