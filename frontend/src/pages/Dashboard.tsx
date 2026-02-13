@@ -27,7 +27,7 @@ export const Dashboard: React.FC = () => {
       <div className="bg-white p-6 rounded-lg shadow">
         <h2 className="text-2xl font-bold text-gray-800 mb-4">Welcome to Timetable ERP System</h2>
         <p className="text-gray-600">
-          This system helps manage your educational institution's timetable, attendance, staff, students, and more.
+          This system helps manage your educational institution&apos;s timetable, attendance, staff, students, and more.
           Use the navigation menu on the left to access different modules.
         </p>
       </div>

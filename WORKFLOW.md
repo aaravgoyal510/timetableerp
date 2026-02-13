@@ -47,14 +47,17 @@ npm run dev
 # Make changes, test thoroughly
 # When feature is COMPLETE:
 
-# 1. Validate locally
+# 1. Validate locally (runs lint + type-check + build)
+npm run validate
+
+# Or use pre-push command
 npm run pre-push
 
 # 2. Commit with clear message
 git add .
 git commit -m "feat: Add student role mapping with CRUD operations"
 
-# 3. Push (build runs automatically)
+# 3. Push (validation runs automatically)
 git push
 ```
 
@@ -80,23 +83,50 @@ refactor: Consolidate dependencies using npm workspaces
 
 ## Pre-Push Safety
 
-**Automatic Build Check:**
-Every `git push` automatically runs `npm run build`
+**Automatic Validation (runs on every git push):**
+1. ✅ **ESLint** - Code quality and style checking
+2. ✅ **Type Check** - TypeScript type validation
+3. ✅ **Build** - Production build compilation
 
-**If build fails:**
+**If any check fails:**
 - Push is aborted ❌
 - Fix errors
 - Try again
 
 **Manual check:**
 ```bash
-npm run pre-push
+npm run validate    # Run all checks
+npm run pre-push    # Same as validate
+npm run lint        # Just linting
+npm run type-check  # Just type checking
+npm run build       # Just build
+```
+
+## Fixing Issues
+
+### Linting Errors
+```bash
+npm run lint:fix    # Auto-fix what's possible
+npm run lint        # Check remaining issues
+```
+
+### TypeScript Errors
+```bash
+npm run type-check  # See type errors
+```
+
+### Build Errors
+```bash
+npm run build      # See build errors
+npm run clean      # Clean and retry
+npm run build
 ```
 
 ## Benefits
 
 - ✅ Never push broken code
+- ✅ Prevent Vercel deployment crashes
 - ✅ Clean commit history
-- ✅ No deployment crashes
-- ✅ Better collaboration
+- ✅ Consistent code quality
 - ✅ Professional workflow
+- ✅ Catch errors before CI/CD

@@ -37,3 +37,8 @@ build/
 *.tmp
 *.temp
 .cache/
+
+# Linting and testing
+.eslintcache
+coverage/
+.nyc_output
