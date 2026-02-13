@@ -15,6 +15,7 @@ export interface Student {
   phone_number: string | number;
   admission_year: number;
   batch: string;
+  class_id: number;
   is_active?: boolean;
 }
 
@@ -38,6 +39,7 @@ export interface Class {
   section: string;
   academic_year: string;
   shift: string;
+  student_count?: number;
   is_active?: boolean;
 }
 
@@ -131,6 +133,12 @@ export interface Role {
   is_active?: boolean;
 }
 
+// Department
+export interface Department {
+  department_id?: number;
+  name: string;
+}
+
 // Staff Role Map
 export interface StaffRoleMap {
   staff_role_map_id?: number;
@@ -138,6 +146,16 @@ export interface StaffRoleMap {
   role_id: number;
   staff_name?: string;
   role_name?: string;
+  is_active?: boolean;
+}
+
+// Staff Department Map
+export interface StaffDeptMap {
+  staff_dept_map_id?: number;
+  staff_id: number;
+  department_id: number;
+  staff_name?: string;
+  department_name?: string;
   is_active?: boolean;
 }
 
@@ -159,6 +177,18 @@ export interface TeacherSubjectMap {
   staff_name?: string;
   subject_name?: string;
   subject_code?: string;
+  is_active?: boolean;
+}
+
+// Staff Availability
+export interface StaffAvailability {
+  availability_id?: number;
+  staff_id: number;
+  timeslot_id: number;
+  is_recurring: boolean;
+  day_of_week?: string;
+  date?: string;
+  reason?: string;
   is_active?: boolean;
 }
 

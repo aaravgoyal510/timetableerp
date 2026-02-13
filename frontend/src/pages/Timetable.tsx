@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { timetableAPI, classAPI, subjectAPI, staffAPI, roomAPI, timeslotAPI } from '../api';
+import { timetableAPI, classesAPI, subjectsAPI, staffAPI, roomsAPI, timeslotAPI } from '../api';
 import type { Class, Subject, Staff, Room, Timeslot } from '../types';
 
 interface Timetable {
@@ -41,10 +41,10 @@ export const Timetable: React.FC = () => {
       setLoading(true);
       const [ttRes, clsRes, subRes, stfRes, rmRes, tsRes] = await Promise.all([
         timetableAPI.getAll(),
-        classAPI.getAll(),
-        subjectAPI.getAll(),
+        classesAPI.getAll(),
+        subjectsAPI.getAll(),
         staffAPI.getAll(),
-        roomAPI.getAll(),
+        roomsAPI.getAll(),
         timeslotAPI.getAll(),
       ]);
       setTimetables(ttRes.data);
@@ -93,34 +93,45 @@ export const Timetable: React.FC = () => {
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <h1 className="text-3xl font-bold text-gray-800">Timetable</h1>
-        <button
-          onClick={() => setShowForm(!showForm)}
-          className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
-        >
-          {showForm ? 'Cancel' : 'Add Entry'}
-        </button>
+      {/* Header */}
+      <div className="bg-white rounded-xl shadow-sm p-6">
+        <div className="flex justify-between items-center">
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900">📅 Timetable</h1>
+            <p className="text-gray-600 mt-1">Manage class schedules and timetable entries</p>
+          </div>
+          <button
+            onClick={() => setShowForm(!showForm)}
+            className="bg-gradient-to-r from-purple-600 to-purple-500 hover:from-purple-700 hover:to-purple-600 text-white px-6 py-3 rounded-lg font-medium transition shadow-md"
+          >
+            {showForm ? 'Cancel' : '➕ Add Entry'}
+          </button>
+        </div>
       </div>
 
       {showForm && (
-        <form onSubmit={handleSubmit} className="bg-white p-6 rounded-lg shadow space-y-4">
-          <select
-            value={formData.class_id}
-            onChange={(e) => setFormData({ ...formData, class_id: parseInt(e.target.value) })}
-            className="w-full px-4 py-2 border rounded"
+        <div className="bg-white rounded-xl shadow-sm p-6">
+          <h2 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
+            <span>➕</span>
+            Add Timetable Entry
+          </h2>
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <select
+              value={formData.class_id}
+              onChange={(e) => setFormData({ ...formData, class_id: parseInt(e.target.value) })}
+              className="w-full px-4 py-2 border-2 border-gray-200 rounded-lg focus:outline-none focus:border-purple-500 transition"
           >
             {classes.map((cls) => (
               <option key={cls.class_id} value={cls.class_id}>
                 {cls.course_name} - Sem {cls.semester}
               </option>
             ))}
-          </select>
-          <select
-            value={formData.subject_code}
-            onChange={(e) => setFormData({ ...formData, subject_code: e.target.value })}
-            className="w-full px-4 py-2 border rounded"
-            required
+            </select>
+            <select
+              value={formData.subject_code}
+              onChange={(e) => setFormData({ ...formData, subject_code: e.target.value })}
+              className="w-full px-4 py-2 border-2 border-gray-200 rounded-lg focus:outline-none focus:border-purple-500 transition"
+              required
           >
             <option value="">Select Subject</option>
             {subjects.map((sub) => (
@@ -128,68 +139,71 @@ export const Timetable: React.FC = () => {
                 {sub.subject_name}
               </option>
             ))}
-          </select>
-          <select
-            value={formData.staff_id}
-            onChange={(e) => setFormData({ ...formData, staff_id: parseInt(e.target.value) })}
-            className="w-full px-4 py-2 border rounded"
+            </select>
+            <select
+              value={formData.staff_id}
+              onChange={(e) => setFormData({ ...formData, staff_id: parseInt(e.target.value) })}
+              className="w-full px-4 py-2 border-2 border-gray-200 rounded-lg focus:outline-none focus:border-purple-500 transition"
           >
             {staff.map((s) => (
               <option key={s.staff_id} value={s.staff_id}>
                 {s.staff_name}
               </option>
             ))}
-          </select>
-          <select
-            value={formData.room_id}
-            onChange={(e) => setFormData({ ...formData, room_id: parseInt(e.target.value) })}
-            className="w-full px-4 py-2 border rounded"
+            </select>
+            <select
+              value={formData.room_id}
+              onChange={(e) => setFormData({ ...formData, room_id: parseInt(e.target.value) })}
+              className="w-full px-4 py-2 border-2 border-gray-200 rounded-lg focus:outline-none focus:border-purple-500 transition"
           >
             {rooms.map((r) => (
               <option key={r.room_id} value={r.room_id}>
                 {r.room_number}
               </option>
             ))}
-          </select>
-          <select
-            value={formData.timeslot_id}
-            onChange={(e) => setFormData({ ...formData, timeslot_id: parseInt(e.target.value) })}
-            className="w-full px-4 py-2 border rounded"
+            </select>
+            <select
+              value={formData.timeslot_id}
+              onChange={(e) => setFormData({ ...formData, timeslot_id: parseInt(e.target.value) })}
+              className="w-full px-4 py-2 border-2 border-gray-200 rounded-lg focus:outline-none focus:border-purple-500 transition"
           >
             {timeslots.map((ts) => (
               <option key={ts.timeslot_id} value={ts.timeslot_id}>
                 {ts.day_of_week} {ts.start_time}-{ts.end_time}
               </option>
             ))}
-          </select>
-          <input
-            type="date"
-            value={formData.timetable_date}
-            onChange={(e) => setFormData({ ...formData, timetable_date: e.target.value })}
-            className="w-full px-4 py-2 border rounded"
-            required
-          />
-          <label className="flex items-center gap-2">
+            </select>
             <input
-              type="checkbox"
-              checked={formData.is_lab}
-              onChange={(e) => setFormData({ ...formData, is_lab: e.target.checked })}
-              className="w-4 h-4"
+              type="date"
+              value={formData.timetable_date}
+              onChange={(e) => setFormData({ ...formData, timetable_date: e.target.value })}
+              className="w-full px-4 py-2 border-2 border-gray-200 rounded-lg focus:outline-none focus:border-purple-500 transition"
+              required
             />
-            <span>Is Lab</span>
-          </label>
-          <button type="submit" className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">
-            Create Entry
-          </button>
-        </form>
+            <label className="flex items-center gap-2 text-gray-700">
+              <input
+                type="checkbox"
+                checked={formData.is_lab}
+                onChange={(e) => setFormData({ ...formData, is_lab: e.target.checked })}
+                className="w-4 h-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500"
+              />
+              <span>Is Lab Session</span>
+            </label>
+            <button type="submit" className="bg-gradient-to-r from-purple-600 to-purple-500 hover:from-purple-700 hover:to-purple-600 text-white px-6 py-3 rounded-lg font-medium transition shadow-md w-full">
+              Create Entry
+            </button>
+          </form>
+        </div>
       )}
 
       {loading ? (
-        <div className="text-center py-10">Loading...</div>
+        <div className="flex items-center justify-center py-10">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600"></div>
+        </div>
       ) : (
-        <div className="bg-white rounded-lg shadow overflow-x-auto">
+        <div className="bg-white rounded-xl shadow-sm overflow-hidden">
           <table className="w-full text-sm">
-            <thead className="bg-gray-100">
+            <thead className="bg-gradient-to-r from-purple-50 to-blue-50 border-b-2 border-purple-100">
               <tr>
                 <th className="px-4 py-3 text-left">Class</th>
                 <th className="px-4 py-3 text-left">Subject</th>

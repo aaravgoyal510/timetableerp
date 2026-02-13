@@ -1,19 +1,23 @@
 import React, { useEffect, useState } from 'react';
-import { holidayAPI } from '../api';
+import { holidaysAPI } from '../api';
+import { Plus, Trash2, Calendar } from 'lucide-react';
 
 interface Holiday {
   holiday_id: number;
   holiday_date: string;
   holiday_name: string;
+  description: string;
 }
 
 export const Holidays: React.FC = () => {
   const [holidays, setHolidays] = useState<Holiday[]>([]);
   const [loading, setLoading] = useState(true);
-  const [showForm, setShowForm] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  
   const [formData, setFormData] = useState({
     holiday_date: '',
     holiday_name: '',
+    description: ''
   });
 
   useEffect(() => {
@@ -22,9 +26,8 @@ export const Holidays: React.FC = () => {
 
   const fetchHolidays = async () => {
     try {
-      setLoading(true);
-      const response = await holidayAPI.getAll();
-      setHolidays(response.data);
+      const response = await holidaysAPI.getAll();
+      setHolidays(response.data || []);
     } catch (error) {
       console.error('Error fetching holidays:', error);
     } finally {
@@ -34,94 +37,148 @@ export const Holidays: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
     try {
-      await holidayAPI.create(formData);
+      setSubmitting(true);
+      await holidaysAPI.create(formData);
+      
       setFormData({
         holiday_date: '',
         holiday_name: '',
+        description: ''
       });
-      setShowForm(false);
+      
       fetchHolidays();
     } catch (error) {
       console.error('Error creating holiday:', error);
+    } finally {
+      setSubmitting(false);
     }
   };
 
   const handleDelete = async (id: number) => {
-    if (window.confirm('Are you sure?')) {
-      try {
-        await holidayAPI.delete(id);
-        fetchHolidays();
-      } catch (error) {
-        console.error('Error deleting holiday:', error);
-      }
+    if (!window.confirm('Delete this holiday?')) return;
+
+    try {
+      await holidaysAPI.delete(id);
+      fetchHolidays();
+    } catch (error) {
+      console.error('Error deleting holiday:', error);
     }
   };
 
+  const formatDate = (dateStr: string) => {
+    const date = new Date(dateStr);
+    return date.toLocaleDateString('en-US', { 
+      weekday: 'short', 
+      year: 'numeric', 
+      month: 'short', 
+      day: 'numeric' 
+    });
+  };
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-96">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600"></div>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <h1 className="text-3xl font-bold text-gray-800">Holidays</h1>
-        <button
-          onClick={() => setShowForm(!showForm)}
-          className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
-        >
-          {showForm ? 'Cancel' : 'Add Holiday'}
-        </button>
+      {/* Header */}
+      <div className="bg-white rounded-xl shadow-sm p-6">
+        <h1 className="text-3xl font-bold text-gray-900">Holidays</h1>
+        <p className="text-gray-600 mt-1">Manage academic year holidays</p>
       </div>
 
-      {showForm && (
-        <form onSubmit={handleSubmit} className="bg-white p-6 rounded-lg shadow space-y-4">
-          <input
-            type="date"
-            value={formData.holiday_date}
-            onChange={(e) => setFormData({ ...formData, holiday_date: e.target.value })}
-            className="w-full px-4 py-2 border rounded"
-            required
-          />
+      {/* Add Form */}
+      <div className="bg-white rounded-xl shadow-sm p-6">
+        <h2 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
+          <span>➕</span>
+          Add New Holiday
+        </h2>
+        <form onSubmit={handleSubmit} className="space-y-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label className="block text-sm text-gray-600 mb-1">Holiday Date</label>
+            <input
+              type="date"
+              value={formData.holiday_date}
+              onChange={(e) => setFormData({ ...formData, holiday_date: e.target.value })}
+              className="w-full px-4 py-2 border-2 border-gray-200 rounded-lg focus:outline-none focus:border-purple-500 transition"
+              required
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm text-gray-600 mb-1">Holiday Name</label>
+            <input
+              type="text"
+              placeholder="e.g., Republic Day"
+              value={formData.holiday_name}
+              onChange={(e) => setFormData({ ...formData, holiday_name: e.target.value })}
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500"
+              required
+            />
+          </div>
+        </div>
+
+        <div>
+          <label className="block text-sm text-gray-600 mb-1">Description (Optional)</label>
           <input
             type="text"
-            placeholder="Holiday Name"
-            value={formData.holiday_name}
-            onChange={(e) => setFormData({ ...formData, holiday_name: e.target.value })}
-            className="w-full px-4 py-2 border rounded"
-            required
+            placeholder="Additional details..."
+            value={formData.description}
+            onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500"
           />
-          <button type="submit" className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">
-            Create Holiday
-          </button>
-        </form>
-      )}
+        </div>
 
-      {loading ? (
-        <div className="text-center py-10">Loading...</div>
+        <div className="flex justify-end">
+          <button
+            type="submit"
+            disabled={submitting}
+            className="bg-gradient-to-r from-purple-600 to-purple-500 hover:from-purple-700 hover:to-purple-600 disabled:bg-gray-400 text-white px-6 py-3 rounded-lg font-medium transition shadow-md flex items-center gap-2"
+          >
+            <Plus size={18} /> Add Holiday
+          </button>
+        </div>
+      </form>
+      </div>
+
+      {/* List */}
+      {holidays.length === 0 ? (
+        <p className="text-center text-gray-500 py-8">No holidays scheduled</p>
       ) : (
-        <div className="bg-white rounded-lg shadow overflow-hidden">
-          <table className="w-full">
-            <thead className="bg-gray-100">
-              <tr>
-                <th className="px-6 py-3 text-left">Date</th>
-                <th className="px-6 py-3 text-left">Name</th>
-                <th className="px-6 py-3 text-left">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {holidays.map((holiday) => (
-                <tr key={holiday.holiday_id} className="border-t hover:bg-gray-50">
-                  <td className="px-6 py-4">{holiday.holiday_date}</td>
-                  <td className="px-6 py-4">{holiday.holiday_name}</td>
-                  <td className="px-6 py-4">
-                    <button
-                      onClick={() => handleDelete(holiday.holiday_id)}
-                      className="bg-red-600 text-white px-3 py-1 rounded hover:bg-red-700 text-sm"
-                    >
-                      Delete
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+        <div className="space-y-3">
+          {holidays.sort((a, b) => new Date(a.holiday_date).getTime() - new Date(b.holiday_date).getTime()).map((holiday) => (
+            <div key={holiday.holiday_id} className="bg-white border border-gray-200 rounded-lg p-5 hover:border-gray-300 transition">
+              <div className="flex items-start justify-between">
+                <div className="flex gap-4">
+                  <div className="bg-orange-100 p-3 rounded-lg">
+                    <Calendar size={24} className="text-orange-600" />
+                  </div>
+                  
+                  <div>
+                    <h3 className="text-lg font-semibold text-gray-900 mb-1">{holiday.holiday_name}</h3>
+                    <p className="text-sm text-gray-600 mb-1">📅 {formatDate(holiday.holiday_date)}</p>
+                    {holiday.description && (
+                      <p className="text-sm text-gray-500">{holiday.description}</p>
+                    )}
+                  </div>
+                </div>
+                
+                <button
+                  onClick={() => handleDelete(holiday.holiday_id)}
+                  className="text-gray-400 hover:text-red-600 transition"
+                >
+                  <Trash2 size={20} />
+                </button>
+              </div>
+            </div>
+          ))}
         </div>
       )}
     </div>

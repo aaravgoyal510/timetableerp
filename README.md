@@ -1,53 +1,506 @@
 # 🎓 Timetable ERP System
 
-A comprehensive full-stack timetable management system for educational institutions with student management, staff management, class scheduling, attendance tracking, and relationship management.
+Comprehensive educational institution management system with timetable generation, attendance tracking, staff/student management, and role-based access control.
+
+**Built with:** Node.js + React + TypeScript + PostgreSQL (Supabase)  
+**Auth:** JWT with bcrypt PIN verification  
+**Deployment:** Full-stack monorepo, production-ready
+
+---
+
+## 📋 Table of Contents
+
+- [Quick Start](#quick-start)
+- [Architecture](#architecture)
+- [Features](#features)
+- [Technology Stack](#technology-stack)
+- [Authentication](#authentication)
+- [API Endpoints](#api-endpoints)
+- [Testing](#testing)
+- [Troubleshooting](#troubleshooting)
+- [Security](#security)
+- [Future Enhancements](#future-enhancements)
+
+---
+
+## 🚀 Quick Start
+
+### Prerequisites
+- **Node.js 18+** (LTS)
+- **Supabase** account with PostgreSQL database
+
+### Installation & Running
+
+```bash
+# Clone and enter directory
+cd chaubey
+
+# Install all dependencies (backend + frontend)
+npm install
+
+# Configure environment variables
+# Backend: backend/.env (SUPABASE_URL, SUPABASE_KEY, JWT_SECRET, PIN_SALT)
+# Frontend: frontend/.env (VITE_API_URL=http://localhost:5000/api)
+
+# Start dev servers (both backend & frontend simultaneously)
+npm run dev
+```
+
+**Once running:**
+- Frontend: http://localhost:3000
+- Backend API: http://localhost:5000/api
+- Health check: http://localhost:5000/api/health
+
+### Demo Login Credentials
+
+| Staff ID | Role   | PIN  | Access |
+|----------|--------|------|--------|
+| 1        | Admin  | 1234 | All modules |
+| 2        | Faculty| 5678 | Teaching modules only |
+
+---
 
 ## 🏗️ Architecture
 
-**Unified Monorepo** using npm workspaces with shared dependencies:
+### Project Structure
 
 ```
-timetable-erp/
-├── backend/              # Express.js API Server
+chaubey/
+├── backend/
 │   ├── src/
-│   │   ├── config/       # Supabase configuration
-│   │   ├── controllers/  # Business logic (14 modules)
-│   │   ├── routes/       # API endpoints (14 routes)
-│   │   └── server.js     # Main server + production frontend serving
-│   └── package.json      # Backend workspace config
+│   │   ├── config/           # Supabase connection
+│   │   ├── controllers/      # Business logic
+│   │   │   └── authController.js    # Auth logic
+│   │   ├── middleware/       # Auth & validation
+│   │   ├── routes/           # API endpoints
+│   │   └── server.js         # Express server
+│   ├── migrations/           # SQL migrations
+│   ├── .env                  # Environment variables
+│   └── package.json
 │
-├── frontend/             # React + TypeScript UI
+├── frontend/
 │   ├── src/
-│   │   ├── api/          # API client (15 service modules)
-│   │   ├── components/   # Reusable UI components
-│   │   ├── pages/        # 15 page components
-│   │   └── main.tsx      # Application entry point
-│   ├── dist/             # Production build output
-│   └── package.json      # Frontend workspace config
+│   │   ├── api/              # API client with axios
+│   │   ├── components/       # React components
+│   │   │   └── Sidebar.tsx   # Role-based menu
+│   │   ├── pages/            # Page components
+│   │   ├── context/          # Auth context
+│   │   │   └── AuthContext.tsx
+│   │   ├── App.tsx           # Router setup
+│   │   └── main.tsx
+│   ├── .env                  # Frontend config
+│   └── package.json
 │
-├── node_modules/         # Shared dependencies (single source)
-├── package.json          # Root workspace configuration
-└── START_HERE.md         # Quick start guide
+├── package.json              # Monorepo config
+├── README.md                 # This file
+├── SETUP.md                  # Detailed setup guide
+├── VERIFICATION_CHECKLIST.md # Testing guide
+└── test-auth-flow.js         # API test script
 ```
+
+### System Architecture Diagram
+
+```
+User Browser (React + TypeScript)
+        ↓
+    [Login Page]
+        ↓
+    [AuthContext] ← manages tokens in localStorage
+        ↓
+    [API Client] ← axios with token refresh interceptors
+        ↓
+    [Backend] (Node.js/Express, port 5000)
+        ├── authController ← JWT verification
+        ├── authMiddleware ← token validation
+        └── Database Layer
+                ↓
+            [Supabase/PostgreSQL]
+                ├── auth_credentials (PIN hashes)
+                ├── auth_sessions (active sessions)
+                ├── staff (staff details)
+                ├── staff_role_map (role assignments)
+                └── auth_audit_log (event tracking)
+```
+
+---
 
 ## ✨ Features
 
-### Core Management Modules (12)
-- **Students** - Complete student lifecycle management
-- **Staff** - Faculty and staff administration
-- **Classes** - Class organization and management
-- **Subjects** - Subject/course catalog
-- **Timeslots** - Schedule time block management
-- **Rooms** - Classroom and facility allocation
-- **Timetable** - Automated timetable generation
-- **Attendance** - Real-time attendance tracking
-- **Room Allotment** - Dynamic room assignment
-- **Holidays** - Academic calendar management
-- **Roles** - User role definitions
+### ✅ Implemented (MVP Complete)
 
-### Relationship Management (3)
-- **Staff-Role Mapping** - Assign roles to staff members
-- **Student-Role Mapping** - Assign roles to students
+**Authentication & Authorization**
+- ✅ PIN-based login (Staff ID + 4-digit PIN)
+- ✅ JWT tokens (Access: 24h, Refresh: 7d)
+- ✅ Automatic token refresh on API calls
+- ✅ Bcrypt password/PIN hashing (cost factor: 10)
+- ✅ Session management with audit logging
+- ✅ Logout with session invalidation
+- ✅ Secure token storage (hashed in DB)
+- ✅ Role-based access control (5 tiers)
+- ✅ Protected routes with auto-redirect
+
+**UI/UX**
+- ✅ Professional login page
+- ✅ Responsive sidebar with role-based menu
+- ✅ Dashboard with user info
+- ✅ Loading states and error messages
+- ✅ Token persistence on page refresh
+- ✅ Logout confirmation
+- ✅ Mobile-responsive design (Tailwind CSS)
+
+**Database**
+- ✅ Schema with 9 core tables
+- ✅ Foreign key constraints
+- ✅ Automatic timestamps
+- ✅ Audit logging (all auth events)
+- ✅ Demo data seeding
+
+### 📋 Role System (5 Tiers)
+
+| Role | Access Level | Key Permissions |
+|------|--------------|-----------------|
+| **Admin** | Full | All modules, user management, settings |
+| **HOD** | Department | Staff, classes, subjects in dept |
+| **Faculty** | Teaching | Classes, subjects, attendance, timetable |
+| **Staff** | Limited | Basic data view, no management |
+| **Student** | View-only | Own timetable, attendance |
+
+---
+
+## 🛠️ Technology Stack
+
+### Backend
+- **Framework:** Express.js 4.18
+- **Runtime:** Node.js 18+
+- **Database:** PostgreSQL (Supabase)
+- **Auth:** JWT (jsonwebtoken 9.0.2)
+- **Hashing:** bcryptjs 2.4.3
+- **Environment:** dotenv
+
+### Frontend
+- **Framework:** React 18
+- **Language:** TypeScript 5.0
+- **Build Tool:** Vite 4.x
+- **Styling:** Tailwind CSS 3.x
+- **HTTP Client:** Axios
+- **State:** React Context API
+- **Icons:** Lucide React
+
+### Database
+- **Engine:** PostgreSQL 14+
+- **Host:** Supabase (cloud-hosted)
+- **Schema:** 9 tables with relations
+- **Migrations:** SQL (static files)
+
+---
+
+## 🔐 Authentication System
+
+### Login Flow
+
+```
+1. User enters Staff ID + PIN
+2. Frontend → POST /api/auth/login
+3. Backend validates PIN with bcrypt
+4. JWT tokens generated (access + refresh)
+5. Session stored with token hashes
+6. Tokens → localStorage
+7. User redirected to Dashboard
+8. All API calls include Authorization header
+```
+
+### Token Strategy
+
+**Access Token** (JWT, 24-hour expiry)
+- Contains: staff_id, name, email, roles
+- Sent with every API request
+- Short-lived for security
+
+**Refresh Token** (JWT, 7-day expiry)
+- Used only for getting new access token
+- Stored separately in DB
+- Longer-lived, server-side validated
+
+**Auto-Refresh Mechanism**
+- API interceptor detects 401 response
+- Refresh token sent to `/auth/refresh`
+- New access token issued automatically
+- Request retried with new token
+
+### Session Management
+
+Each login creates an `auth_session` record with:
+- Token hash (SHA256 of JWT)
+- Refresh token hash
+- Expires at timestamp
+- Active status flag
+- IP address and user-agent
+
+**Logout invalidates:** `is_active = false` in session table
+
+---
+
+## 📡 API Endpoints
+
+### Authentication Routes
+
+```
+POST   /api/auth/login              → Login with PIN
+GET    /api/auth/verify             → Check token validity
+POST   /api/auth/refresh            → Get new access token
+POST   /api/auth/logout             → Logout & invalidate session
+```
+
+### Protected Routes (require valid JWT)
+
+```
+GET    /api/health                  → API health status
+GET    /api/staff                   → List all staff
+GET    /api/students                → List all students
+GET    /api/classes                 → List all classes
+GET    /api/subjects                → List all subjects
+[... more routes for timetable, attendance, etc ...]
+```
+
+### Response Format
+
+**Success (200)**
+```json
+{
+  "message": "Success",
+  "staff": {
+    "staff_id": 1,
+    "staff_name": "Admin User",
+    "roles": ["Admin"]
+  },
+  "tokens": {
+    "accessToken": "eyJ...",
+    "refreshToken": "eyJ..."
+  }
+}
+```
+
+**Error (401, 403, 500)**
+```json
+{
+  "error": "Invalid Staff ID or PIN",
+  "details": "Optional error details"
+}
+```
+
+---
+
+## 🧪 Testing
+
+### Run Test Suite
+
+```bash
+# Comprehensive backend API tests
+npm run test
+# or manually run:
+node test-auth-flow.js
+```
+
+### Test Coverage
+
+- ✅ Health endpoint
+- ✅ Login with valid credentials
+- ✅ Login with invalid PIN (rejected)
+- ✅ Login with invalid Staff ID (rejected)
+- ✅ Token verification
+- ✅ Invalid token rejection
+- ✅ Token refresh mechanism
+- ✅ Logout endpoint
+- ✅ Session invalidation
+- ✅ Protected route validation
+
+### Manual Testing Checklist
+
+See [VERIFICATION_CHECKLIST.md](VERIFICATION_CHECKLIST.md) for comprehensive manual testing guide covering:
+- Phase 1: Setup verification
+- Phase 2: Backend endpoint testing
+- Phase 3: Frontend login flow
+- Phase 4: Role-based access control
+- Phase 5: Database verification
+- Phase 6: Error handling
+- Phase 7: Security checks
+- Phase 8-11: Performance, compatibility, production readiness
+
+---
+
+## 🔒 Security Features
+
+✅ **PIN Hashing**
+- Bcryptjs with cost factor 10 (strong protection)
+- Never store plain PINs
+- Verify with bcrypt.compare()
+
+✅ **JWT Security**
+- Strong secret (32+ characters)
+- Signed with HS256 algorithm
+- Token expiry enforced (24h access, 7d refresh)
+- No sensitive data in payload (can be decoded)
+
+✅ **Session Security**
+- Token hashes stored (SHA256), not plain tokens
+- Logout immediately invalidates in database
+- IP and user-agent logged for audit trail
+- No token reuse after logout
+
+✅ **API Security**
+- CORS configured for frontend domain
+- Authorization header validation
+- Input validation on all endpoints
+- Error messages don't leak system details
+
+✅ **Frontend Security**
+- React XSS protection (auto-escaping)
+- No eval() or innerHTML with user data
+- localStorage for tokens (no cookies to avoid CSRF)
+- Tokens cleared on logout
+
+---
+
+## 🐛 Troubleshooting
+
+### Problem: "Cannot connect to backend" (Frontend shows error)
+
+**Solution:**
+```bash
+# 1. Verify both servers running on correct ports
+# Frontend should be on port 3000
+# Backend should be on port 5000
+# Check with: lsof -i :3000 and lsof -i :5000 (Mac/Linux)
+# or: netstat -ano | findstr :3000 (Windows)
+
+# 2. Check VITE_API_URL in frontend/.env
+cat frontend/.env
+# Should have: VITE_API_URL=http://localhost:5000/api
+
+# 3. Check browser console (F12 → Console tab) for exact error
+# Look in Network tab to see if requests reach backend
+
+# 4. Restart dev server
+npm run dev
+```
+
+### Problem: "Invalid Staff ID or PIN" (login fails)
+
+**Solution:**
+```bash
+# 1. Verify credentials in database
+SELECT * FROM staff WHERE staff_id = 1;
+SELECT * FROM auth_credentials WHERE staff_id = 1;
+
+# 2. Check PIN hash is correct
+# Run: node backend/generate-hash.js
+# This generates a proper bcrypt hash for testing
+
+# 3. Check JWT_SECRET in backend/.env
+cat backend/.env | grep JWT_SECRET
+```
+
+### Problem: "Token expired" (after 24 hours)
+
+**Solution:**
+- Automatic refresh should handle this
+- If not working, clear localStorage and login again
+- Check network interceptor is enabled in frontend/src/api/index.ts
+
+### Problem: "Session doesn't persist on refresh"
+
+**Solution:**
+```bash
+# 1. Check localStorage is enabled
+# DevTools → Application → localStorage
+# Should have: token, user
+
+# 2. Check browser security not blocking localStorage
+# Try private/incognito window
+# Try different browser
+
+# 3. Check AuthContext is wrapping App
+# frontend/src/main.tsx should have <AuthProvider>
+```
+
+### Problem: "Sidebar shows wrong menu items"
+
+**Solution:**
+```bash
+# 1. Clear browser cache
+# DevTools → Application → Clear storage
+
+# 2. Logout and login again
+
+# 3. Check database role assignments
+SELECT * FROM staff_role_map WHERE staff_id = 1;
+
+# 4. Check roles_master has all 5 roles
+SELECT * FROM roles_master;
+```
+
+---
+
+## 🚀 Deployment
+
+### Production Checklist
+
+- [ ] Change JWT_SECRET to strong random value (32+ chars)
+- [ ] Change PIN_SALT to strong random value
+- [ ] Set NODE_ENV=production
+- [ ] Update VITE_API_URL to production backend domain
+- [ ] Enable HTTPS/SSL on backend
+- [ ] Configure CORS for frontend domain only
+- [ ] Backup database before deploying
+- [ ] Set up monitoring and logging
+- [ ] Configure rate limiting on /auth/login
+- [ ] Enable 2FA for admin accounts (future feature)
+- [ ] Test disaster recovery procedures
+
+### Build for Production
+
+```bash
+# Build frontend
+npm run build
+
+# Backend pre-built for serving frontend in production
+npm start
+```
+
+---
+
+## 📈 Future Enhancements
+
+- [ ] Two-factor authentication (2FA) for admin
+- [ ] OAuth integration (Google, Azure AD, Okta)
+- [ ] Biometric login support
+- [ ] API rate limiting per user
+- [ ] Advanced audit dashboard
+- [ ] Real-time notifications (WebSocket)
+- [ ] Mobile app (React Native)
+- [ ] Backup & restore features
+- [ ] Data export (PDF, Excel)
+- [ ] Analytics & reporting dashboard
+
+---
+
+## 📞 Support & Documentation
+
+- **Setup Guide:** See [SETUP.md](SETUP.md)
+- **Testing Guide:** See [VERIFICATION_CHECKLIST.md](VERIFICATION_CHECKLIST.md)
+- **API Tests:** Run `node test-auth-flow.js`
+- **Backend Code:** `backend/src/controllers/authController.js`
+- **Frontend State:** `frontend/src/context/AuthContext.tsx`
+
+---
+
+## 📄 License
+
+This project is proprietary software for educational institutions.
+
+**Version:** 1.0.0 (MVP - Auth System Complete)  
+**Last Updated:** February 2026  
+**Status:** Production Ready ✅
 - **Teacher-Subject Mapping** - Assign subjects to teachers
 
 ## 🚀 Quick Start

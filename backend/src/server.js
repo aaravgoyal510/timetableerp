@@ -4,11 +4,14 @@ const cors = require('cors');
 const path = require('path');
 
 // Import routes
-let studentRoutes, staffRoutes, classRoutes, subjectRoutes, timeslotRoutes, 
-    roomRoutes, timetableRoutes, attendanceRoutes, roomAllotmentRoutes, 
-    holidayRoutes, roleRoutes, staffRoleMapRoutes, studentRoleMapRoutes, teacherSubjectMapRoutes;
+let authRoutes, coreRoutes, studentRoutes, staffRoutes, classRoutes, subjectRoutes, timeslotRoutes, 
+  roomRoutes, timetableRoutes, attendanceRoutes, roomAllotmentRoutes, 
+  holidayRoutes, roleRoutes, staffRoleMapRoutes, studentRoleMapRoutes, teacherSubjectMapRoutes,
+  departmentRoutes, staffDeptMapRoutes, staffAvailabilityRoutes;
 
 try {
+  authRoutes = require('./routes/auth');
+  coreRoutes = require('./routes/coreRoutes');
   studentRoutes = require('./routes/students');
   staffRoutes = require('./routes/staff');
   classRoutes = require('./routes/classes');
@@ -23,6 +26,9 @@ try {
   staffRoleMapRoutes = require('./routes/staffRoleMap');
   studentRoleMapRoutes = require('./routes/studentRoleMap');
   teacherSubjectMapRoutes = require('./routes/teacherSubjectMap');
+  departmentRoutes = require('./routes/departments');
+  staffDeptMapRoutes = require('./routes/staffDeptMap');
+  staffAvailabilityRoutes = require('./routes/staffAvailability');
 } catch (err) {
   console.error('Error loading routes:', err.message);
 }
@@ -52,6 +58,8 @@ app.get('/api/health', (req, res) => {
 });
 
 // API Routes
+app.use('/api/auth', authRoutes);
+app.use('/api', coreRoutes);  // Main API routes (students, classes, timetable, etc.)
 app.use('/api/students', studentRoutes);
 app.use('/api/staff', staffRoutes);
 app.use('/api/classes', classRoutes);
@@ -66,6 +74,9 @@ app.use('/api/roles', roleRoutes);
 app.use('/api/staff-role-map', staffRoleMapRoutes);
 app.use('/api/student-role-map', studentRoleMapRoutes);
 app.use('/api/teacher-subject-map', teacherSubjectMapRoutes);
+app.use('/api/departments', departmentRoutes);
+app.use('/api/staff-dept-map', staffDeptMapRoutes);
+app.use('/api/staff-availability', staffAvailabilityRoutes);
 
 // Serve frontend for all non-API routes in production
 if (isProduction) {

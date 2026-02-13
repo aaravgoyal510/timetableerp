@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { roomAllotmentAPI, roomAPI, classAPI, staffAPI, subjectAPI, timeslotAPI } from '../api';
+import { roomAllotmentAPI, roomsAPI, classesAPI, staffAPI, subjectsAPI, timeslotAPI } from '../api';
 import type { Room, Class, Staff, Subject, Timeslot } from '../types';
 
 interface RoomAllotment {
@@ -90,56 +90,67 @@ export const RoomAllotment: React.FC = () => {
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <h1 className="text-3xl font-bold text-gray-800">Room Allotment</h1>
-        <button
-          onClick={() => setShowForm(!showForm)}
-          className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
-        >
-          {showForm ? 'Cancel' : 'New Allotment'}
-        </button>
+      {/* Header */}
+      <div className="bg-white rounded-xl shadow-sm p-6">
+        <div className="flex justify-between items-center">
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900">📍 Room Allotment</h1>
+            <p className="text-gray-600 mt-1">Allocate rooms for classes and activities</p>
+          </div>
+          <button
+            onClick={() => setShowForm(!showForm)}
+            className="bg-gradient-to-r from-purple-600 to-purple-500 hover:from-purple-700 hover:to-purple-600 text-white px-6 py-3 rounded-lg font-medium transition shadow-md"
+          >
+            {showForm ? 'Cancel' : '➕ New Allotment'}
+          </button>
+        </div>
       </div>
 
       {showForm && (
-        <form onSubmit={handleSubmit} className="bg-white p-6 rounded-lg shadow space-y-4">
-          <select
-            value={formData.room_id}
-            onChange={(e) => setFormData({ ...formData, room_id: parseInt(e.target.value) })}
-            className="w-full px-4 py-2 border rounded"
+        <div className="bg-white rounded-xl shadow-sm p-6">
+          <h2 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
+            <span>➕</span>
+            Create Room Allotment
+          </h2>
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <select
+              value={formData.room_id}
+              onChange={(e) => setFormData({ ...formData, room_id: parseInt(e.target.value) })}
+              className="w-full px-4 py-2 border-2 border-gray-200 rounded-lg focus:outline-none focus:border-purple-500 transition"
           >
             {rooms.map((room) => (
               <option key={room.room_id} value={room.room_id}>
                 {room.room_number} ({room.room_type})
               </option>
             ))}
-          </select>
-          <select
-            value={formData.class_id}
-            onChange={(e) => setFormData({ ...formData, class_id: parseInt(e.target.value) })}
-            className="w-full px-4 py-2 border rounded"
+            </select>
+            <select
+              value={formData.class_id}
+              onChange={(e) => setFormData({ ...formData, class_id: parseInt(e.target.value) })}
+              className="w-full px-4 py-2 border-2 border-gray-200 rounded-lg focus:outline-none focus:border-purple-500 transition"
           >
             {classes.map((cls) => (
               <option key={cls.class_id} value={cls.class_id}>
                 {cls.course_name}
               </option>
             ))}
-          </select>
-          <select
-            value={formData.staff_id}
-            onChange={(e) => setFormData({ ...formData, staff_id: parseInt(e.target.value) })}
-            className="w-full px-4 py-2 border rounded"
+            </select>
+            <select
+              value={formData.staff_id}
+              onChange={(e) => setFormData({ ...formData, staff_id: parseInt(e.target.value) })}
+              className="w-full px-4 py-2 border-2 border-gray-200 rounded-lg focus:outline-none focus:border-purple-500 transition"
           >
             {staff.map((s) => (
               <option key={s.staff_id} value={s.staff_id}>
                 {s.staff_name}
               </option>
             ))}
-          </select>
-          <select
-            value={formData.subject_code}
-            onChange={(e) => setFormData({ ...formData, subject_code: e.target.value })}
-            className="w-full px-4 py-2 border rounded"
-            required
+            </select>
+            <select
+              value={formData.subject_code}
+              onChange={(e) => setFormData({ ...formData, subject_code: e.target.value })}
+              className="w-full px-4 py-2 border-2 border-gray-200 rounded-lg focus:outline-none focus:border-purple-500 transition"
+              required
           >
             <option value="">Select Subject</option>
             {subjects.map((sub) => (
@@ -147,37 +158,40 @@ export const RoomAllotment: React.FC = () => {
                 {sub.subject_name}
               </option>
             ))}
-          </select>
-          <select
-            value={formData.timeslot_id}
-            onChange={(e) => setFormData({ ...formData, timeslot_id: parseInt(e.target.value) })}
-            className="w-full px-4 py-2 border rounded"
+            </select>
+            <select
+              value={formData.timeslot_id}
+              onChange={(e) => setFormData({ ...formData, timeslot_id: parseInt(e.target.value) })}
+              className="w-full px-4 py-2 border-2 border-gray-200 rounded-lg focus:outline-none focus:border-purple-500 transition"
           >
             {timeslots.map((ts) => (
               <option key={ts.timeslot_id} value={ts.timeslot_id}>
                 {ts.day_of_week} {ts.start_time}
               </option>
             ))}
-          </select>
-          <input
-            type="date"
-            value={formData.allotment_date}
-            onChange={(e) => setFormData({ ...formData, allotment_date: e.target.value })}
-            className="w-full px-4 py-2 border rounded"
-            required
-          />
-          <button type="submit" className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">
-            Create Allotment
-          </button>
-        </form>
+            </select>
+            <input
+              type="date"
+              value={formData.allotment_date}
+              onChange={(e) => setFormData({ ...formData, allotment_date: e.target.value })}
+              className="w-full px-4 py-2 border-2 border-gray-200 rounded-lg focus:outline-none focus:border-purple-500 transition"
+              required
+            />
+            <button type="submit" className="bg-gradient-to-r from-purple-600 to-purple-500 hover:from-purple-700 hover:to-purple-600 text-white px-6 py-3 rounded-lg font-medium transition shadow-md w-full">
+              Create Allotment
+            </button>
+          </form>
+        </div>
       )}
 
       {loading ? (
-        <div className="text-center py-10">Loading...</div>
+        <div className="flex items-center justify-center py-10">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600"></div>
+        </div>
       ) : (
-        <div className="bg-white rounded-lg shadow overflow-x-auto">
+        <div className="bg-white rounded-xl shadow-sm overflow-hidden">
           <table className="w-full text-sm">
-            <thead className="bg-gray-100">
+            <thead className="bg-gradient-to-r from-purple-50 to-blue-50 border-b-2 border-purple-100">
               <tr>
                 <th className="px-4 py-3 text-left">Room</th>
                 <th className="px-4 py-3 text-left">Class</th>

@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Work+Sans:wght@400;500;600;700&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -8,10 +10,84 @@
   box-sizing: border-box;
 }
 
+:root {
+  --ink: #1f2428;
+  --cream: #f4efe7;
+  --paper: #fbf9f3;
+  --teal: #2b8c8c;
+  --teal-dark: #1d6b6b;
+  --muted: #6b6b63;
+  --line: rgba(31, 36, 40, 0.12);
+  --shadow: 0 18px 40px rgba(31, 36, 40, 0.12);
+}
+
 body {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
+  font-family: 'Work Sans', 'Segoe UI', sans-serif;
+  color: var(--ink);
+  background-color: var(--cream);
+  background-image:
+    radial-gradient(circle at top left, rgba(43, 140, 140, 0.12), transparent 55%),
+    radial-gradient(circle at 10% 40%, rgba(31, 36, 40, 0.08), transparent 45%);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+h1, h2, h3, h4, .display {
+  font-family: 'DM Serif Display', 'Times New Roman', serif;
+  letter-spacing: 0.2px;
+}
+
+.app-shell {
+  background: transparent;
+}
+
+.app-main {
+  background: var(--paper);
+  border-left: 1px solid var(--line);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.6);
+}
+
+.sidebar {
+  background: var(--ink);
+  color: var(--paper);
+}
+
+.sidebar-title {
+  font-family: 'DM Serif Display', serif;
+  letter-spacing: 0.4px;
+}
+
+.sidebar-item {
+  border-left: 3px solid transparent;
+  transition: background 0.2s ease, border-color 0.2s ease;
+}
+
+.sidebar-item:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.sidebar-item.active {
+  border-left-color: var(--teal);
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.card {
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: 20px;
+  box-shadow: var(--shadow);
+}
+
+.stat-label {
+  color: var(--muted);
+  font-size: 0.8rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.stat-value {
+  color: var(--teal);
+  font-size: 2.2rem;
+  margin-top: 0.6rem;
+  font-family: 'DM Serif Display', serif;
 }

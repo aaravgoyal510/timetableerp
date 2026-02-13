@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { attendanceAPI, studentAPI, classAPI, subjectAPI, staffAPI, timeslotAPI } from '../api';
+import { attendanceAPI, studentsAPI, classesAPI, subjectsAPI, staffAPI, timeslotAPI } from '../api';
 import type { Student, Class, Subject, Staff, Timeslot } from '../types';
 
 interface Attendance {
@@ -93,45 +93,56 @@ export const Attendance: React.FC = () => {
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <h1 className="text-3xl font-bold text-gray-800">Attendance</h1>
-        <button
-          onClick={() => setShowForm(!showForm)}
-          className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
-        >
-          {showForm ? 'Cancel' : 'Mark Attendance'}
-        </button>
+      {/* Header */}
+      <div className="bg-white rounded-xl shadow-sm p-6">
+        <div className="flex justify-between items-center">
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900">✅ Attendance</h1>
+            <p className="text-gray-600 mt-1">Track and manage student attendance</p>
+          </div>
+          <button
+            onClick={() => setShowForm(!showForm)}
+            className="bg-gradient-to-r from-purple-600 to-purple-500 hover:from-purple-700 hover:to-purple-600 text-white px-6 py-3 rounded-lg font-medium transition shadow-md"
+          >
+            {showForm ? 'Cancel' : '➕ Mark Attendance'}
+          </button>
+        </div>
       </div>
 
       {showForm && (
-        <form onSubmit={handleSubmit} className="bg-white p-6 rounded-lg shadow space-y-4">
-          <select
-            value={formData.student_id}
-            onChange={(e) => setFormData({ ...formData, student_id: parseInt(e.target.value) })}
-            className="w-full px-4 py-2 border rounded"
+        <div className="bg-white rounded-xl shadow-sm p-6">
+          <h2 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
+            <span>➕</span>
+            Mark New Attendance
+          </h2>
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <select
+              value={formData.student_id}
+              onChange={(e) => setFormData({ ...formData, student_id: parseInt(e.target.value) })}
+              className="w-full px-4 py-2 border-2 border-gray-200 rounded-lg focus:outline-none focus:border-purple-500 transition"
           >
             {students.map((std) => (
               <option key={std.student_id} value={std.student_id}>
                 {std.student_name} ({std.roll_number})
               </option>
             ))}
-          </select>
-          <select
-            value={formData.class_id}
-            onChange={(e) => setFormData({ ...formData, class_id: parseInt(e.target.value) })}
-            className="w-full px-4 py-2 border rounded"
+            </select>
+            <select
+              value={formData.class_id}
+              onChange={(e) => setFormData({ ...formData, class_id: parseInt(e.target.value) })}
+              className="w-full px-4 py-2 border-2 border-gray-200 rounded-lg focus:outline-none focus:border-purple-500 transition"
           >
             {classes.map((cls) => (
               <option key={cls.class_id} value={cls.class_id}>
                 {cls.course_name}
               </option>
             ))}
-          </select>
-          <select
-            value={formData.subject_code}
-            onChange={(e) => setFormData({ ...formData, subject_code: e.target.value })}
-            className="w-full px-4 py-2 border rounded"
-            required
+            </select>
+            <select
+              value={formData.subject_code}
+              onChange={(e) => setFormData({ ...formData, subject_code: e.target.value })}
+              className="w-full px-4 py-2 border-2 border-gray-200 rounded-lg focus:outline-none focus:border-purple-500 transition"
+              required
           >
             <option value="">Select Subject</option>
             {subjects.map((sub) => (
@@ -139,56 +150,59 @@ export const Attendance: React.FC = () => {
                 {sub.subject_name}
               </option>
             ))}
-          </select>
-          <select
-            value={formData.staff_id}
-            onChange={(e) => setFormData({ ...formData, staff_id: parseInt(e.target.value) })}
-            className="w-full px-4 py-2 border rounded"
+            </select>
+            <select
+              value={formData.staff_id}
+              onChange={(e) => setFormData({ ...formData, staff_id: parseInt(e.target.value) })}
+              className="w-full px-4 py-2 border-2 border-gray-200 rounded-lg focus:outline-none focus:border-purple-500 transition"
           >
             {staff.map((s) => (
               <option key={s.staff_id} value={s.staff_id}>
                 {s.staff_name}
               </option>
             ))}
-          </select>
-          <select
-            value={formData.timeslot_id}
-            onChange={(e) => setFormData({ ...formData, timeslot_id: parseInt(e.target.value) })}
-            className="w-full px-4 py-2 border rounded"
+            </select>
+            <select
+              value={formData.timeslot_id}
+              onChange={(e) => setFormData({ ...formData, timeslot_id: parseInt(e.target.value) })}
+              className="w-full px-4 py-2 border-2 border-gray-200 rounded-lg focus:outline-none focus:border-purple-500 transition"
           >
             {timeslots.map((ts) => (
               <option key={ts.timeslot_id} value={ts.timeslot_id}>
                 {ts.day_of_week} {ts.start_time}-{ts.end_time}
               </option>
             ))}
-          </select>
-          <input
-            type="date"
-            value={formData.attendance_date}
-            onChange={(e) => setFormData({ ...formData, attendance_date: e.target.value })}
-            className="w-full px-4 py-2 border rounded"
-            required
-          />
-          <select
-            value={formData.status}
-            onChange={(e) => setFormData({ ...formData, status: e.target.value })}
-            className="w-full px-4 py-2 border rounded"
+            </select>
+            <input
+              type="date"
+              value={formData.attendance_date}
+              onChange={(e) => setFormData({ ...formData, attendance_date: e.target.value })}
+              className="w-full px-4 py-2 border-2 border-gray-200 rounded-lg focus:outline-none focus:border-purple-500 transition"
+              required
+            />
+            <select
+              value={formData.status}
+              onChange={(e) => setFormData({ ...formData, status: e.target.value })}
+              className="w-full px-4 py-2 border-2 border-gray-200 rounded-lg focus:outline-none focus:border-purple-500 transition"
           >
-            <option value="Present">Present</option>
-            <option value="Absent">Absent</option>
-          </select>
-          <button type="submit" className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">
-            Mark Attendance
-          </button>
-        </form>
+              <option value="Present">Present</option>
+              <option value="Absent">Absent</option>
+            </select>
+            <button type="submit" className="bg-gradient-to-r from-purple-600 to-purple-500 hover:from-purple-700 hover:to-purple-600 text-white px-6 py-3 rounded-lg font-medium transition shadow-md w-full">
+              Mark Attendance
+            </button>
+          </form>
+        </div>
       )}
 
       {loading ? (
-        <div className="text-center py-10">Loading...</div>
+        <div className="flex items-center justify-center py-10">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600"></div>
+        </div>
       ) : (
-        <div className="bg-white rounded-lg shadow overflow-x-auto">
+        <div className="bg-white rounded-xl shadow-sm overflow-hidden">
           <table className="w-full text-sm">
-            <thead className="bg-gray-100">
+            <thead className="bg-gradient-to-r from-purple-50 to-blue-50 border-b-2 border-purple-100">
               <tr>
                 <th className="px-4 py-3 text-left">Student</th>
                 <th className="px-4 py-3 text-left">Subject</th>

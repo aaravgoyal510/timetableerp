@@ -2,9 +2,9 @@ const supabase = require('../config/supabase');
 
 // Mock data for when Supabase is unavailable
 const MOCK_CLASSES = [
-  { class_id: 1, class_name: 'B1', semester: 1, section: 'A', total_students: 60, is_active: true },
-  { class_id: 2, class_name: 'B2', semester: 2, section: 'A', total_students: 58, is_active: true },
-  { class_id: 3, class_name: 'B3', semester: 3, section: 'B', total_students: 55, is_active: true },
+  { class_id: 1, course_name: 'BCA', semester: 1, section: 'A', academic_year: '2024-2025', shift: 'Morning', student_count: 60, is_active: true },
+  { class_id: 2, course_name: 'BCA', semester: 2, section: 'A', academic_year: '2024-2025', shift: 'Morning', student_count: 58, is_active: true },
+  { class_id: 3, course_name: 'BCA', semester: 3, section: 'B', academic_year: '2024-2025', shift: 'Evening', student_count: 55, is_active: true },
 ];
 
 const getAllClasses = async (req, res) => {
@@ -39,6 +39,7 @@ const createClass = async (req, res) => {
         section,
         academic_year,
         shift,
+        student_count: 0,
         is_active: true
       }
     ]).select();

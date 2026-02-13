@@ -32,13 +32,19 @@ const getRoomById = async (req, res) => {
 const createRoom = async (req, res) => {
   try {
     const { room_number, room_type, block_name, floor_number, capacity, has_projector, has_ac, computer_count } = req.body;
+    if (capacity === null || capacity === undefined) {
+      return res.status(422).json({ error: 'Room capacity is required.' });
+    }
+    if (Number.isNaN(Number(capacity)) || Number(capacity) <= 0) {
+      return res.status(422).json({ error: 'Room capacity must be greater than 0.' });
+    }
     const { data, error } = await supabase.from('rooms').insert([
       {
         room_number,
         room_type,
         block_name,
         floor_number,
-        capacity,
+        capacity: Number(capacity),
         has_projector: has_projector || false,
         has_ac: has_ac || false,
         computer_count: computer_count || 0,
@@ -57,6 +63,14 @@ const updateRoom = async (req, res) => {
   try {
     const { id } = req.params;
     const updates = req.body;
+    if (Object.prototype.hasOwnProperty.call(updates, 'capacity')) {
+      if (updates.capacity === null || updates.capacity === undefined) {
+        return res.status(422).json({ error: 'Room capacity cannot be null.' });
+      }
+      if (Number.isNaN(Number(updates.capacity)) || Number(updates.capacity) <= 0) {
+        return res.status(422).json({ error: 'Room capacity must be greater than 0.' });
+      }
+    }
     const { data, error } = await supabase.from('rooms').update(updates).eq('room_id', id).select();
     if (error) throw error;
     res.status(200).json(data[0]);

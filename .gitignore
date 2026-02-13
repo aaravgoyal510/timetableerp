@@ -42,3 +42,18 @@ build/
 .eslintcache
 coverage/
 .nyc_output
+
+# Documentation (exclude from git)
+ARCHITECTURE.md
+AUTH_SETUP.md
+FILE_MANIFEST.md
+IMPLEMENTATION_SUMMARY.md
+MODULES_GUIDE.md
+QUICKSTART_AUTH.md
+SETUP.md
+START_HERE.md
+START_HERE_AUTH.md
+VALIDATION.md
+VERIFICATION_CHECKLIST.md
+WORKFLOW.md
+test-auth-flow.js

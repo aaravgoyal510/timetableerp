@@ -1,62 +1,90 @@
 import React, { useState } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 
 interface Navigation {
   name: string;
   href: string;
   icon: string;
+  requiredRoles?: string[];
 }
 
 const navigation: Navigation[] = [
   { name: 'Dashboard', href: '/', icon: '📊' },
-  { name: 'Students', href: '/students', icon: '👨‍🎓' },
-  { name: 'Staff', href: '/staff', icon: '👨‍🏫' },
-  { name: 'Classes', href: '/classes', icon: '🏫' },
-  { name: 'Subjects', href: '/subjects', icon: '📚' },
-  { name: 'Timeslots', href: '/timeslots', icon: '⏰' },
-  { name: 'Rooms', href: '/rooms', icon: '🚪' },
+  { name: 'Students', href: '/students', icon: '👨‍🎓', requiredRoles: ['Admin', 'Faculty', 'HOD'] },
+  { name: 'Staff', href: '/staff', icon: '👨‍🏫', requiredRoles: ['Admin', 'HOD'] },
+  { name: 'Classes', href: '/classes', icon: '🏫', requiredRoles: ['Admin', 'HOD', 'Faculty'] },
+  { name: 'Subjects', href: '/subjects', icon: '📚', requiredRoles: ['Admin', 'HOD', 'Faculty'] },
+  { name: 'Timeslots', href: '/timeslots', icon: '⏰', requiredRoles: ['Admin', 'HOD'] },
+  { name: 'Rooms', href: '/rooms', icon: '🚪', requiredRoles: ['Admin', 'HOD'] },
   { name: 'Timetable', href: '/timetable', icon: '📅' },
-  { name: 'Attendance', href: '/attendance', icon: '✓' },
-  { name: 'Room Allotment', href: '/room-allotment', icon: '🔑' },
-  { name: 'Holidays', href: '/holidays', icon: '🎉' },
-  { name: 'Roles', href: '/roles', icon: '👥' },
-  { name: 'Staff Roles', href: '/staff-role-map', icon: '🎓' },
-  { name: 'Student Roles', href: '/student-role-map', icon: '📋' },
-  { name: 'Teacher Subjects', href: '/teacher-subject-map', icon: '📖' },
+  { name: 'Attendance', href: '/attendance', icon: '✓', requiredRoles: ['Admin', 'Faculty', 'Staff'] },
+  { name: 'Room Allotment', href: '/room-allotment', icon: '🔑', requiredRoles: ['Admin', 'HOD'] },
+  { name: 'Holidays', href: '/holidays', icon: '🎉', requiredRoles: ['Admin'] },
+  { name: 'Roles', href: '/roles', icon: '👥', requiredRoles: ['Admin'] },
+  { name: 'Departments', href: '/departments', icon: '🏢', requiredRoles: ['Admin', 'HOD'] },
+  { name: 'Staff Roles', href: '/staff-role-map', icon: '🎓', requiredRoles: ['Admin'] },
+  { name: 'Staff Depts', href: '/staff-dept-map', icon: '🧭', requiredRoles: ['Admin', 'HOD'] },
+  { name: 'Student Roles', href: '/student-role-map', icon: '📋', requiredRoles: ['Admin'] },
+  { name: 'Teacher Subjects', href: '/teacher-subject-map', icon: '📖', requiredRoles: ['Admin', 'HOD'] },
+  { name: 'Staff Availability', href: '/staff-availability', icon: '🗓️', requiredRoles: ['Admin', 'HOD'] },
 ];
 
 export const Sidebar: React.FC = () => {
-  const [isOpen, setIsOpen] = useState(true);
   const location = useLocation();
+  const { staff, logout, hasRole } = useAuth();
+  const navigate = useNavigate();
+
+  const handleLogout = async () => {
+    await logout();
+    navigate('/login');
+  };
+
+  const filteredNav = navigation.filter(item => {
+    if (!item.requiredRoles) return true;
+    return hasRole(item.requiredRoles);
+  });
 
   return (
-    <aside className={`${isOpen ? 'w-64' : 'w-20'} bg-blue-900 text-white transition-all duration-300 min-h-screen flex flex-col`}>
-      <div className="p-4 flex items-center justify-between">
-        {isOpen && <h1 className="text-xl font-bold">Timetable ERP</h1>}
-        <button
-          onClick={() => setIsOpen(!isOpen)}
-          className="p-2 hover:bg-blue-800 rounded"
-        >
-          {isOpen ? '←' : '→'}
-        </button>
+    <aside className="w-64 bg-white border-r border-gray-200 h-screen flex flex-col">
+      {/* Header */}
+      <div className="p-6 border-b border-gray-200">
+        <h1 className="text-xl font-semibold text-gray-900">Institution ERP</h1>
+        {staff && (
+          <div className="mt-3">
+            <p className="text-sm font-medium text-gray-900">{staff.staff_name}</p>
+            <p className="text-xs text-gray-500">{staff.roles.join(', ')}</p>
+          </div>
+        )}
       </div>
 
-      <nav className="flex-1 overflow-y-auto">
-        {navigation.map((item) => (
+      {/* Navigation */}
+      <nav className="flex-1 overflow-y-auto py-4">
+        {filteredNav.map((item) => (
           <Link
             key={item.href}
             to={item.href}
-            className={`flex items-center gap-3 px-4 py-3 transition ${
+            className={`flex items-center gap-3 px-6 py-2.5 text-sm ${
               location.pathname === item.href
-                ? 'bg-blue-700 border-l-4 border-white'
-                : 'hover:bg-blue-800'
+                ? 'text-blue-600 bg-blue-50 border-r-2 border-blue-600 font-medium'
+                : 'text-gray-700 hover:bg-gray-50 hover:text-gray-900'
             }`}
           >
-            <span className="text-lg">{item.icon}</span>
-            {isOpen && <span>{item.name}</span>}
+            <span>{item.icon}</span>
+            <span>{item.name}</span>
           </Link>
         ))}
       </nav>
+
+      {/* Logout */}
+      <div className="p-4 border-t border-gray-200">
+        <button
+          onClick={handleLogout}
+          className="w-full px-4 py-2 text-sm text-gray-700 hover:text-gray-900 hover:bg-gray-100 rounded-md transition"
+        >
+          Logout
+        </button>
+      </div>
     </aside>
   );
 };

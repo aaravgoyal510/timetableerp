@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { classAPI } from '../api';
+import { classesAPI } from '../api';
+import { Plus, Trash2, Users } from 'lucide-react';
 
 interface Class {
   class_id: number;
@@ -14,12 +15,14 @@ interface Class {
 export const Classes: React.FC = () => {
   const [classes, setClasses] = useState<Class[]>([]);
   const [loading, setLoading] = useState(true);
-  const [showForm, setShowForm] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  
+  const currentYear = new Date().getFullYear();
   const [formData, setFormData] = useState({
     course_name: '',
-    semester: 1,
-    section: '',
-    academic_year: '2024-2025',
+    semester: '1',
+    section: 'A',
+    academic_year: `${currentYear}-${currentYear + 1}`,
     shift: 'Morning',
   });
 
@@ -29,9 +32,8 @@ export const Classes: React.FC = () => {
 
   const fetchClasses = async () => {
     try {
-      setLoading(true);
-      const response = await classAPI.getAll();
-      setClasses(response.data);
+      const response = await classesAPI.getAll();
+      setClasses(response.data || []);
     } catch (error) {
       console.error('Error fetching classes:', error);
     } finally {
@@ -41,129 +43,190 @@ export const Classes: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
     try {
-      await classAPI.create(formData);
-      setFormData({
-        course_name: '',
-        semester: 1,
-        section: '',
-        academic_year: '2024-2025',
-        shift: 'Morning',
+      setSubmitting(true);
+      await classesAPI.create({
+        ...formData,
+        semester: parseInt(formData.semester),
       });
-      setShowForm(false);
+      
+      // Auto-increment section for next entry
+      const nextSection = String.fromCharCode(formData.section.charCodeAt(0) + 1);
+      setFormData({
+        ...formData,
+        section: nextSection <= 'Z' ? nextSection : 'A',
+      });
+      
       fetchClasses();
     } catch (error) {
       console.error('Error creating class:', error);
+    } finally {
+      setSubmitting(false);
     }
   };
 
   const handleDelete = async (id: number) => {
-    if (window.confirm('Are you sure?')) {
-      try {
-        await classAPI.delete(id);
-        fetchClasses();
-      } catch (error) {
-        console.error('Error deleting class:', error);
-      }
+    if (!window.confirm('Delete this class?')) return;
+
+    try {
+      await classesAPI.delete(id);
+      fetchClasses();
+    } catch (error) {
+      console.error('Error deleting class:', error);
     }
   };
 
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-96">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600"></div>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <h1 className="text-3xl font-bold text-gray-800">Classes</h1>
-        <button
-          onClick={() => setShowForm(!showForm)}
-          className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
-        >
-          {showForm ? 'Cancel' : 'Add Class'}
-        </button>
+      {/* Header */}
+      <div className="bg-white rounded-xl shadow-sm p-6">
+        <h1 className="text-3xl font-bold text-gray-900">Classes</h1>
+        <p className="text-gray-600 mt-1">Manage class sections and schedules</p>
       </div>
 
-      {showForm && (
-        <form onSubmit={handleSubmit} className="bg-white p-6 rounded-lg shadow space-y-4">
-          <input
-            type="text"
-            placeholder="Course Name"
-            value={formData.course_name}
-            onChange={(e) => setFormData({ ...formData, course_name: e.target.value })}
-            className="w-full px-4 py-2 border rounded"
-            required
-          />
-          <input
-            type="number"
-            placeholder="Semester"
-            value={formData.semester}
-            onChange={(e) => setFormData({ ...formData, semester: parseInt(e.target.value) })}
-            className="w-full px-4 py-2 border rounded"
-            min="1"
-            max="8"
-          />
-          <input
-            type="text"
-            placeholder="Section"
-            value={formData.section}
-            onChange={(e) => setFormData({ ...formData, section: e.target.value })}
-            className="w-full px-4 py-2 border rounded"
-          />
-          <input
-            type="text"
-            placeholder="Academic Year"
-            value={formData.academic_year}
-            onChange={(e) => setFormData({ ...formData, academic_year: e.target.value })}
-            className="w-full px-4 py-2 border rounded"
-          />
-          <select
-            value={formData.shift}
-            onChange={(e) => setFormData({ ...formData, shift: e.target.value })}
-            className="w-full px-4 py-2 border rounded"
-          >
-            <option value="Morning">Morning</option>
-            <option value="Evening">Evening</option>
-          </select>
-          <button type="submit" className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">
-            Create Class
-          </button>
-        </form>
-      )}
+      {/* Add Form */}
+      <div className="bg-white rounded-xl shadow-sm p-6">
+        <h2 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
+          <span>➕</span>
+          Add New Class
+        </h2>
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div>
+              <label className="block text-sm text-gray-600 mb-1">Course Name</label>
+              <input
+                type="text"
+                placeholder="e.g., B.Tech CSE"
+                value={formData.course_name}
+                onChange={(e) => setFormData({ ...formData, course_name: e.target.value })}
+                className="w-full px-4 py-2 border-2 border-gray-200 rounded-lg focus:outline-none focus:border-purple-500 transition"
+                required
+              />
+            </div>
 
-      {loading ? (
-        <div className="text-center py-10">Loading...</div>
-      ) : (
-        <div className="bg-white rounded-lg shadow overflow-hidden">
-          <table className="w-full">
-            <thead className="bg-gray-100">
-              <tr>
-                <th className="px-6 py-3 text-left">Course Name</th>
-                <th className="px-6 py-3 text-left">Semester</th>
-                <th className="px-6 py-3 text-left">Section</th>
-                <th className="px-6 py-3 text-left">Academic Year</th>
-                <th className="px-6 py-3 text-left">Shift</th>
-                <th className="px-6 py-3 text-left">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {classes.map((cls) => (
-                <tr key={cls.class_id} className="border-t hover:bg-gray-50">
-                  <td className="px-6 py-4">{cls.course_name}</td>
-                  <td className="px-6 py-4">{cls.semester}</td>
-                  <td className="px-6 py-4">{cls.section}</td>
-                  <td className="px-6 py-4">{cls.academic_year}</td>
-                  <td className="px-6 py-4">{cls.shift}</td>
-                  <td className="px-6 py-4">
-                    <button
-                      onClick={() => handleDelete(cls.class_id)}
-                      className="bg-red-600 text-white px-3 py-1 rounded hover:bg-red-700 text-sm"
-                    >
-                      Delete
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+            <div>
+              <label className="block text-sm text-gray-600 mb-1">Semester</label>
+              <select
+                value={formData.semester}
+                onChange={(e) => setFormData({ ...formData, semester: e.target.value })}
+                className="w-full px-4 py-2 border-2 border-gray-200 rounded-lg focus:outline-none focus:border-purple-500 transition"
+              >
+                {[1, 2, 3, 4, 5, 6, 7, 8].map(sem => (
+                  <option key={sem} value={sem}>Semester {sem}</option>
+                ))}
+              </select>
+            </div>
+
+            <div>
+              <label className="block text-sm text-gray-600 mb-1">Section</label>
+              <input
+                type="text"
+                maxLength={2}
+                placeholder="A, B, C..."
+                value={formData.section}
+                onChange={(e) => setFormData({ ...formData, section: e.target.value.toUpperCase() })}
+                className="w-full px-4 py-2 border-2 border-gray-200 rounded-lg focus:outline-none focus:border-purple-500 transition"
+                required
+              />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm text-gray-600 mb-1">Academic Year</label>
+              <input
+                type="text"
+                placeholder="2024-2025"
+                value={formData.academic_year}
+                onChange={(e) => setFormData({ ...formData, academic_year: e.target.value })}
+                className="w-full px-4 py-2 border-2 border-gray-200 rounded-lg focus:outline-none focus:border-purple-500 transition"
+                required
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm text-gray-600 mb-1">Shift</label>
+              <select
+                value={formData.shift}
+                onChange={(e) => setFormData({ ...formData, shift: e.target.value })}
+                className="w-full px-4 py-2 border-2 border-gray-200 rounded-lg focus:outline-none focus:border-purple-500 transition"
+              >
+                <option value="Morning">Morning</option>
+                <option value="Evening">Evening</option>
+              </select>
+            </div>
+          </div>
+
+          <div className="flex justify-end">
+            <button
+              type="submit"
+              disabled={submitting}
+              className="bg-gradient-to-r from-purple-600 to-purple-500 hover:from-purple-700 hover:to-purple-600 disabled:from-gray-400 disabled:to-gray-400 text-white px-8 py-3 rounded-lg font-medium transition shadow-md"
+            >
+              Add Class
+            </button>
+          </div>
+        </form>
+      </div>
+
+      {/* List */}
+      <div className="bg-white rounded-xl shadow-sm overflow-hidden">
+        <div className="p-6 border-b border-gray-200">
+          <h2 className="text-lg font-bold text-gray-900 flex items-center gap-2">
+            <span>🏫</span>
+            All Classes ({classes.length})
+          </h2>
+        </div>
+        {classes.length === 0 ? (
+          <div className="p-12 text-center text-gray-500">
+            <div className="text-5xl mb-4">💭</div>
+            <div className="font-medium">No classes yet</div>
+            <div className="text-sm mt-1">Add your first class to get started</div>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 p-6">
+          {classes.map((cls) => (
+            <div key={cls.class_id} className="bg-white border border-gray-200 rounded-lg p-5 hover:border-gray-300 transition">
+              <div className="flex items-start justify-between mb-3">
+                <div className="flex items-center gap-3">
+                  <div className="bg-blue-100 p-2 rounded-lg">
+                    <Users size={24} className="text-blue-600" />
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-semibold text-gray-900">{cls.course_name}</h3>
+                    <p className="text-sm text-gray-600">Section {cls.section}</p>
+                  </div>
+                </div>
+                <button
+                  onClick={() => handleDelete(cls.class_id)}
+                  className="text-gray-400 hover:text-red-600 transition"
+                >
+                  <Trash2 size={20} />
+                </button>
+              </div>
+
+              <div className="space-y-1 text-sm text-gray-600">
+                <div className="flex items-center gap-2">
+                  <span className="bg-gray-100 px-3 py-1 rounded-md">Sem {cls.semester}</span>
+                  <span className="bg-gray-100 px-3 py-1 rounded-md">{cls.shift}</span>
+                </div>
+                <p>📅 {cls.academic_year}</p>
+                {cls.is_active && <span className="text-green-600 font-medium">● Active</span>}
+              </div>
+            </div>
+          ))}
         </div>
       )}
+      </div>
     </div>
   );
 };
