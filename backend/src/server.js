@@ -1,6 +1,7 @@
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
+const path = require('path');
 
 // Import routes
 let studentRoutes, staffRoutes, classRoutes, subjectRoutes, timeslotRoutes, 
@@ -27,18 +28,30 @@ try {
 }
 
 const app = express();
+const isProduction = process.env.NODE_ENV === 'production';
 
 // Middleware
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+// Serve static files from frontend build in production
+if (isProduction) {
+  const frontendPath = path.join(__dirname, '../../frontend/dist');
+  app.use(express.static(frontendPath));
+  console.log(`📦 Serving frontend from: ${frontendPath}`);
+}
+
 // Health check
 app.get('/api/health', (req, res) => {
-  res.status(200).json({ status: 'API is running' });
+  res.status(200).json({ 
+    status: 'API is running',
+    environment: process.env.NODE_ENV || 'development',
+    timestamp: new Date().toISOString()
+  });
 });
 
-// Routes
+// API Routes
 app.use('/api/students', studentRoutes);
 app.use('/api/staff', staffRoutes);
 app.use('/api/classes', classRoutes);
@@ -54,6 +67,13 @@ app.use('/api/staff-role-map', staffRoleMapRoutes);
 app.use('/api/student-role-map', studentRoleMapRoutes);
 app.use('/api/teacher-subject-map', teacherSubjectMapRoutes);
 
+// Serve frontend for all non-API routes in production
+if (isProduction) {
+  app.get('*', (req, res) => {
+    res.sendFile(path.join(__dirname, '../../frontend/dist/index.html'));
+  });
+}
+
 // Error handling
 app.use((err, req, res, next) => {
   console.error(err.stack);
@@ -62,5 +82,11 @@ app.use((err, req, res, next) => {
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
+  console.log(`🚀 Timetable ERP Server`);
+  console.log(`📍 Environment: ${process.env.NODE_ENV || 'development'}`);
+  console.log(`🌐 Server: http://localhost:${PORT}`);
+  console.log(`⚡ API: http://localhost:${PORT}/api`);
+  if (isProduction) {
+    console.log(`📱 Frontend: http://localhost:${PORT}`);
+  }
 });

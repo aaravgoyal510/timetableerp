@@ -1,54 +1,127 @@
-# 🎯 JUST RUN THIS ONE COMMAND
+# 🎯 Timetable ERP - Unified Full-Stack Application
 
 ## Quick Start
+
+### Development Mode (Frontend + Backend)
 ```bash
-npm install && npm run dev
+npm install
+npm run dev
 ```
 
-This installs all dependencies in one place and starts both backend (port 5000) and frontend (port 3000) together!
+- Backend API: http://localhost:5000/api
+- Frontend: http://localhost:3000
 
-## Open Browser
+### Production Mode (Single Server)
+```bash
+npm install
+npm run build
+npm run start:production
 ```
-http://localhost:3000
-```
+
+- Everything at: http://localhost:5000
 
 ---
 
-## 📦 Workspace Structure
+## 📦 Project Structure
 
-This project uses **npm workspaces** - all dependencies are installed at the root level and shared between frontend and backend. This saves disk space and makes dependency management simpler!
+This is a **unified monorepo** using npm workspaces:
 
-**Benefits:**
-- ✅ Single `npm install` for everything
-- ✅ No duplicate node_modules
-- ✅ Faster installation
-- ✅ Easier dependency management
-
----
-
-## Alternative: Run Separately
-
-If you prefer to run them separately:
-
-### Backend Only
-```bash
-npm run dev:backend
+```
+timetable-erp/
+├── backend/          # Express API server
+├── frontend/         # React + TypeScript UI
+├── node_modules/     # Shared dependencies (all packages)
+└── package.json      # Root workspace configuration
 ```
 
-### Frontend Only
-```bash
-npm run dev:frontend
-```
+**Key Features:**
+- ✅ Single `node_modules` - no duplication
+- ✅ Shared dependencies between frontend & backend
+- ✅ Unified build and deployment process
+- ✅ Production mode serves frontend from backend
 
 ---
-
-**That's all! Your complete Timetable ERP is running.** ✨
 
 ## Available Commands
 
-- `npm install` - Install all dependencies (frontend & backend)
-- `npm run dev` - Run both frontend & backend
-- `npm run dev:backend` - Run only backend
-- `npm run dev:frontend` - Run only frontend
-- `npm run build` - Build frontend for production
-- `npm run start` - Start backend in production mode
+### Development
+```bash
+npm run dev              # Run both frontend & backend
+npm run dev:backend      # Run only backend (port 5000)
+npm run dev:frontend     # Run only frontend (port 3000)
+```
+
+### Building
+```bash
+npm run build            # Build frontend for production
+npm run build:production # Clean + build everything
+npm run clean            # Remove build outputs
+```
+
+### Production
+```bash
+npm run start            # Start backend only
+npm run start:production # Start unified app (backend serves frontend)
+```
+
+### Testing & Validation
+```bash
+npm test                 # Run all tests
+npm run check            # Validate entire project
+npm run preview          # Preview production build
+```
+
+### Deployment
+```bash
+npm run deploy:prepare   # Prepare for deployment (clean + build)
+```
+
+---
+
+## 🚀 Deployment Options
+
+### Option 1: Development (Recommended for Local)
+Two separate servers for hot-reload:
+```bash
+npm run dev
+```
+
+### Option 2: Production (Single Server)
+Backend serves the built frontend:
+```bash
+npm run build
+npm run start:production
+```
+Access everything at http://localhost:5000
+
+---
+
+## 📊 Benefits of This Structure
+
+1. **Unified Dependencies** - Install once, use everywhere
+2. **Faster Builds** - No duplicate installations
+3. **Less Disk Space** - Single node_modules (~145MB vs ~300MB)
+4. **Simplified Deployment** - Single server in production
+5. **Easy Maintenance** - Update packages once, applies to all
+6. **Environment Aware** - Automatically adapts dev vs production
+
+---
+
+## 🔧 Environment Variables
+
+### Backend (.env)
+```
+PORT=5000
+NODE_ENV=production
+SUPABASE_URL=your_supabase_url
+SUPABASE_KEY=your_supabase_key
+```
+
+### Frontend (.env)
+```
+VITE_API_URL=http://localhost:5000/api
+```
+
+---
+
+**That's it! Your complete Timetable ERP system is ready.** ✨

@@ -1,96 +1,222 @@
-# Timetable ERP System
+# 🎓 Timetable ERP System
 
-A comprehensive timetable management system for educational institutions with student management, staff management, class scheduling, attendance tracking, and more.
+A comprehensive full-stack timetable management system for educational institutions with student management, staff management, class scheduling, attendance tracking, and relationship management.
 
-## Project Structure
+## 🏗️ Architecture
+
+**Unified Monorepo** using npm workspaces with shared dependencies:
 
 ```
-├── backend/           # Node.js Express API
+timetable-erp/
+├── backend/              # Express.js API Server
 │   ├── src/
-│   │   ├── config/   # Database configuration
-│   │   ├── controllers/  # Business logic
-│   │   ├── routes/   # API routes
-│   │   └── server.js # Main server file
-│   └── package.json
+│   │   ├── config/       # Supabase configuration
+│   │   ├── controllers/  # Business logic (14 modules)
+│   │   ├── routes/       # API endpoints (14 routes)
+│   │   └── server.js     # Main server + production frontend serving
+│   └── package.json      # Backend workspace config
 │
-└── frontend/         # React TypeScript UI
-    ├── src/
-    │   ├── api/      # API client
-    │   ├── components/  # Reusable components
-    │   ├── pages/    # Page components
-    │   └── main.tsx  # Entry point
-    └── package.json
+├── frontend/             # React + TypeScript UI
+│   ├── src/
+│   │   ├── api/          # API client (15 service modules)
+│   │   ├── components/   # Reusable UI components
+│   │   ├── pages/        # 15 page components
+│   │   └── main.tsx      # Application entry point
+│   ├── dist/             # Production build output
+│   └── package.json      # Frontend workspace config
+│
+├── node_modules/         # Shared dependencies (single source)
+├── package.json          # Root workspace configuration
+└── START_HERE.md         # Quick start guide
 ```
 
-## Features
+## ✨ Features
 
-- **Student Management**: Add, edit, and manage students
-- **Staff Management**: Manage faculty members
-- **Class Management**: Create and organize classes
-- **Subject Management**: Manage subjects and courses
-- **Timeslot Management**: Schedule class timeslots
-- **Room Management**: Manage classroom inventory
-- **Timetable Creation**: Generate and manage timetables
-- **Attendance Tracking**: Mark and track student attendance
-- **Room Allotment**: Allocate rooms for classes
-- **Holiday Management**: Manage academic holidays
-- **Role Management**: User role and permission management
+### Core Management Modules (12)
+- **Students** - Complete student lifecycle management
+- **Staff** - Faculty and staff administration
+- **Classes** - Class organization and management
+- **Subjects** - Subject/course catalog
+- **Timeslots** - Schedule time block management
+- **Rooms** - Classroom and facility allocation
+- **Timetable** - Automated timetable generation
+- **Attendance** - Real-time attendance tracking
+- **Room Allotment** - Dynamic room assignment
+- **Holidays** - Academic calendar management
+- **Roles** - User role definitions
 
-## Setup Instructions
+### Relationship Management (3)
+- **Staff-Role Mapping** - Assign roles to staff members
+- **Student-Role Mapping** - Assign roles to students
+- **Teacher-Subject Mapping** - Assign subjects to teachers
 
-### ⚡ Quick Start (3 minutes)
+## 🚀 Quick Start
 
-**Terminal 1 - Backend:**
+### Development Mode (Hot Reload)
 ```bash
-cd backend
 npm install
 npm run dev
 ```
+- **Backend API**: http://localhost:5000/api
+- **Frontend**: http://localhost:3000
 
-**Terminal 2 - Frontend:**
+### Production Mode (Single Server)
 ```bash
-cd frontend  
 npm install
-npm run dev
+npm run build
+npm run start:production
+```
+- **Full Application**: http://localhost:5000
+
+## 📋 Available Commands
+
+| Command | Description |
+|---------|-------------|
+| `npm install` | Install all dependencies (one command for everything) |
+| `npm run dev` | Start development mode (frontend + backend) |
+| `npm run dev:backend` | Start only backend server (port 5000) |
+| `npm run dev:frontend` | Start only frontend server (port 3000) |
+| `npm run build` | Build frontend for production |
+| `npm run build:production` | Clean build everything |
+| `npm run start` | Start backend only |
+| `npm run start:production` | Start unified production server |
+| `npm test` | Run all tests |
+| `npm run clean` | Remove build outputs |
+| `npm run preview` | Preview production build |
+| `npm run deploy:prepare` | Prepare for deployment |
+
+## 🗄️ Database Schema
+
+PostgreSQL database on **Supabase** with 14+ tables:
+
+### Main Tables
+- `students` - Student records
+- `staff` - Staff/faculty records  
+- `classes` - Class definitions
+- `subjects_master` - Subject catalog
+- `timeslots` - Time blocks
+- `rooms` - Room inventory
+- `timetable` - Schedule entries
+- `attendance` - Attendance records
+- `room_allotment` - Room assignments
+- `holidays` - Holiday calendar
+- `roles_master` - Role definitions
+
+### Mapping Tables
+- `staff_role_map` - Staff→Role relationships
+- `student_role_map` - Student→Role relationships
+- `teacher_subject_map` - Teacher→Subject relationships
+
+📁 See `DATABASE_SCHEMA.sql` and `SAMPLE_DATA.sql` for complete schema
+
+## 🔌 API Endpoints (14 Modules)
+
+All endpoints are prefixed with `/api`:
+
+| Module | Endpoints | Methods |
+|--------|-----------|---------|
+| Students | `/api/students` | GET, POST, PUT, DELETE |
+| Staff | `/api/staff` | GET, POST, PUT, DELETE |
+| Classes | `/api/classes` | GET, POST, PUT, DELETE |
+| Subjects | `/api/subjects` | GET, POST, PUT, DELETE |
+| Timeslots | `/api/timeslots` | GET, POST, PUT, DELETE |
+| Rooms | `/api/rooms` | GET, POST, PUT, DELETE |
+| Timetable | `/api/timetable` | GET, POST, PUT, DELETE |
+| Attendance | `/api/attendance` | GET, POST, PUT, DELETE |
+| Room Allotment | `/api/room-allotment` | GET, POST, PUT, DELETE |
+| Holidays | `/api/holidays` | GET, POST, PUT, DELETE |
+| Roles | `/api/roles` | GET, POST, PUT, DELETE |
+| Staff-Role Map | `/api/staff-role-map` | GET, POST, PUT, DELETE |
+| Student-Role Map | `/api/student-role-map` | GET, POST, PUT, DELETE |
+| Teacher-Subject Map | `/api/teacher-subject-map` | GET, POST, PUT, DELETE |
+
+**Health Check**: `GET /api/health`
+
+## 🛠️ Technologies
+
+### Backend Stack
+- **Runtime**: Node.js (>=16.0.0)
+- **Framework**: Express.js 4.18.2
+- **Database**: Supabase (PostgreSQL)
+- **Authentication**: Supabase Auth
+- **Dev Tools**: Nodemon, Jest
+
+### Frontend Stack
+- **Framework**: React 18.2.0
+- **Language**: TypeScript 4.9.3
+- **Build Tool**: Vite 4.1.0
+- **Styling**: Tailwind CSS 3.2.7
+- **Routing**: React Router 6.8.0
+- **HTTP Client**: Axios 1.3.2
+
+### Development
+- **Package Manager**: npm workspaces
+- **Process Manager**: Concurrently
+- **Environment**: cross-env
+
+## ⚙️ Configuration
+
+### Backend Environment (.env)
+```env
+PORT=5000
+NODE_ENV=development
+SUPABASE_URL=your_supabase_project_url
+SUPABASE_KEY=your_supabase_anon_key
 ```
 
-**Then open:** http://localhost:3000 ✓
+### Frontend Environment (.env)
+```env
+VITE_API_URL=http://localhost:5000/api
+```
 
-Note: Database tables are already created in your Supabase instance. No schema setup needed!
+## 📦 Workspace Benefits
 
-## API Endpoints
+1. **Unified Dependencies** - Single `node_modules` for entire project (~145MB instead of ~300MB)
+2. **Faster Installation** - Install once, use everywhere
+3. **Consistent Versions** - No version conflicts between frontend/backend
+4. **Simplified Maintenance** - Update packages in one place
+5. **Easy Deployment** - Production mode serves everything from one server
+6. **Better DX** - One command to rule them all
 
-- `GET /api/students` - Get all students
-- `POST /api/students` - Create new student
-- `POST /api/staff` - Create new staff
-- `GET /api/classes` - Get all classes
-- `POST /api/timetable` - Create timetable entry
-- `POST /api/attendance` - Mark attendance
-- And more...
+## 🚢 Deployment
 
-## Database
+### Option 1: Separate Deployment
+Deploy frontend (Vercel/Netlify) and backend (Heroku/Railway) separately.
 
-Your Supabase database has all tables already created:
-- students
-- staff
-- classes
-- subjects_master
-- timeslots
-- rooms
-- timetable
-- attendance
-- room_allotment
-- holidays
-- roles_master
+### Option 2: Unified Deployment
+Deploy as single server (backend serves built frontend):
+```bash
+npm run build
+npm run start:production
+```
 
-📁 `DATABASE_SCHEMA.sql` - Reference backup only (tables already exist)
+## 📈 Features & Capabilities
 
-## Technologies Used
+- ✅ Full CRUD operations on all entities
+- ✅ Real-time data sync with Supabase
+- ✅ Mock data fallback for offline development
+- ✅ Responsive UI with Tailwind CSS
+- ✅ TypeScript for type safety
+- ✅ Environment-based configuration
+- ✅ Production-ready build system
+- ✅ Comprehensive error handling
+- ✅ RESTful API architecture
+- ✅ Modular component structure
 
-- **Backend**: Node.js, Express.js, Supabase
-- **Frontend**: React, TypeScript, Tailwind CSS
-- **Database**: PostgreSQL (via Supabase)
+## 📝 License
 
-## Default API Configuration
+ISC
 
-The frontend is configured to connect to `http://localhost:5000/api` by default. Change this in `frontend/src/api/index.ts` if your backend runs on a different URL.
+## 🤝 Contributing
+
+This is a complete timetable management system. Feel free to extend with:
+- Additional relationship types
+- Bulk import/export
+- Advanced reporting
+- User authentication UI
+- Role-based access control
+- Mobile app integration
+
+---
+
+**For quick start instructions, see [START_HERE.md](START_HERE.md)**
