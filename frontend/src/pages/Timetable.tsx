@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { timetableAPI, classAPI, subjectAPI, staffAPI, roomAPI, timeslotAPI } from '../api';
+import type { Class, Subject, Staff, Room, Timeslot } from '../types';
 
 interface Timetable {
-  timetable_id: number;
+  timetable_id?: number;
   class_id: number;
   subject_code: string;
   staff_id: number;
@@ -16,11 +17,11 @@ export const Timetable: React.FC = () => {
   const [timetables, setTimetables] = useState<Timetable[]>([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
-  const [classes, setClasses] = useState<any[]>([]);
-  const [subjects, setSubjects] = useState<any[]>([]);
-  const [staff, setStaff] = useState<any[]>([]);
-  const [rooms, setRooms] = useState<any[]>([]);
-  const [timeslots, setTimeslots] = useState<any[]>([]);
+  const [classes, setClasses] = useState<Class[]>([]);
+  const [subjects, setSubjects] = useState<Subject[]>([]);
+  const [staff, setStaff] = useState<Staff[]>([]);
+  const [rooms, setRooms] = useState<Room[]>([]);
+  const [timeslots, setTimeslots] = useState<Timeslot[]>([]);
   const [formData, setFormData] = useState({
     class_id: 1,
     subject_code: '',
@@ -218,7 +219,7 @@ export const Timetable: React.FC = () => {
                     <td className="px-4 py-3">{entry.is_lab ? '✓' : '✗'}</td>
                     <td className="px-4 py-3">
                       <button
-                        onClick={() => handleDelete(entry.timetable_id)}
+                        onClick={() => entry.timetable_id && handleDelete(entry.timetable_id)}
                         className="bg-red-600 text-white px-3 py-1 rounded hover:bg-red-700 text-xs"
                       >
                         Delete

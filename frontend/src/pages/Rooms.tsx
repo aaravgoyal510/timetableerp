@@ -28,6 +28,7 @@ export const Rooms: React.FC = () => {
     has_projector: false,
     has_ac: false,
     computer_count: 0,
+    availability_status: 'Available',
   });
 
   useEffect(() => {
@@ -59,6 +60,7 @@ export const Rooms: React.FC = () => {
         has_projector: false,
         has_ac: false,
         computer_count: 0,
+        availability_status: 'Available',
       });
       setShowForm(false);
       fetchRooms();

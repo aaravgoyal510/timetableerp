@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { roomAllotmentAPI, roomAPI, classAPI, staffAPI, subjectAPI, timeslotAPI } from '../api';
+import type { Room, Class, Staff, Subject, Timeslot } from '../types';
 
 interface RoomAllotment {
-  booking_id: number;
+  booking_id?: number;
   room_id: number;
   class_id: number;
   staff_id: number;
@@ -15,11 +16,11 @@ export const RoomAllotment: React.FC = () => {
   const [allotments, setAllotments] = useState<RoomAllotment[]>([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
-  const [rooms, setRooms] = useState<any[]>([]);
-  const [classes, setClasses] = useState<any[]>([]);
-  const [staff, setStaff] = useState<any[]>([]);
-  const [subjects, setSubjects] = useState<any[]>([]);
-  const [timeslots, setTimeslots] = useState<any[]>([]);
+  const [rooms, setRooms] = useState<Room[]>([]);
+  const [classes, setClasses] = useState<Class[]>([]);
+  const [staff, setStaff] = useState<Staff[]>([]);
+  const [subjects, setSubjects] = useState<Subject[]>([]);
+  const [timeslots, setTimeslots] = useState<Timeslot[]>([]);
   const [formData, setFormData] = useState({
     room_id: 1,
     class_id: 1,
@@ -201,7 +202,7 @@ export const RoomAllotment: React.FC = () => {
                     <td className="px-4 py-3">{all.allotment_date}</td>
                     <td className="px-4 py-3">
                       <button
-                        onClick={() => handleDelete(all.booking_id)}
+                        onClick={() => all.booking_id && handleDelete(all.booking_id)}
                         className="bg-red-600 text-white px-3 py-1 rounded hover:bg-red-700 text-xs"
                       >
                         Delete
