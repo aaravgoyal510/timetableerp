@@ -146,8 +146,8 @@ export const dashboardAPI = {
 export const studentsAPI = {
   getAll: (classId?: number) => api.get('/students', { params: { class_id: classId } }),
   getById: (id: number) => api.get(`/students/${id}`),
-  create: (data: any) => api.post('/students', data),
-  update: (id: number, data: any) => api.put(`/students/${id}`, data),
+  create: (data: Record<string, unknown>) => api.post('/students', data),
+  update: (id: number, data: Record<string, unknown>) => api.put(`/students/${id}`, data),
   delete: (id: number) => api.delete(`/students/${id}`),
 };
 
@@ -157,8 +157,8 @@ export const studentsAPI = {
 export const staffAPI = {
   getAll: (departmentId?: number) => api.get('/staff', { params: { department_id: departmentId } }),
   getById: (id: number) => api.get(`/staff/${id}`),
-  create: (data: any) => api.post('/staff', data),
-  update: (id: number, data: any) => api.put(`/staff/${id}`, data),
+  create: (data: Record<string, unknown>) => api.post('/staff', data),
+  update: (id: number, data: Record<string, unknown>) => api.put(`/staff/${id}`, data),
   delete: (id: number) => api.delete(`/staff/${id}`),
 };
 
@@ -168,8 +168,8 @@ export const staffAPI = {
 export const classesAPI = {
   getAll: (departmentId?: number) => api.get('/classes', { params: { department_id: departmentId } }),
   getById: (id: number) => api.get(`/classes/${id}`),
-  create: (data: any) => api.post('/classes', data),
-  update: (id: number, data: any) => api.put(`/classes/${id}`, data),
+  create: (data: Record<string, unknown>) => api.post('/classes', data),
+  update: (id: number, data: Record<string, unknown>) => api.put(`/classes/${id}`, data),
   delete: (id: number) => api.delete(`/classes/${id}`),
 };
 
@@ -180,8 +180,8 @@ export const subjectsAPI = {
   getAll: (departmentId?: number, semester?: number) => 
     api.get('/subjects', { params: { department_id: departmentId, semester } }),
   getById: (id: number) => api.get(`/subjects/${id}`),
-  create: (data: any) => api.post('/subjects', data),
-  update: (id: number, data: any) => api.put(`/subjects/${id}`, data),
+  create: (data: Record<string, unknown>) => api.post('/subjects', data),
+  update: (id: number, data: Record<string, unknown>) => api.put(`/subjects/${id}`, data),
   delete: (code: string | number) => api.delete(`/subjects/${code}`),
 };
 
@@ -192,8 +192,8 @@ export const timetableAPI = {
   getAll: (classId?: number, staffId?: number, dayOfWeek?: string, academicYear?: string) =>
     api.get('/timetable', { params: { class_id: classId, staff_id: staffId, day_of_week: dayOfWeek, academic_year: academicYear } }),
   getById: (id: number) => api.get(`/timetable/${id}`),
-  create: (data: any) => api.post('/timetable', data),
-  update: (id: number, data: any) => api.put(`/timetable/${id}`, data),
+  create: (data: Record<string, unknown>) => api.post('/timetable', data),
+  update: (id: number, data: Record<string, unknown>) => api.put(`/timetable/${id}`, data),
   delete: (id: number) => api.delete(`/timetable/${id}`),
 };
 
@@ -203,8 +203,8 @@ export const timetableAPI = {
 export const attendanceAPI = {
   getAll: (studentId?: number, classId?: number, subjectId?: number, date?: string) =>
     api.get('/attendance', { params: { student_id: studentId, class_id: classId, subject_id: subjectId, attendance_date: date } }),
-  create: (data: any) => api.post('/attendance', data),
-  mark: (data: any) => api.post('/attendance/mark', data),
+  create: (data: Record<string, unknown>) => api.post('/attendance', data),
+  mark: (data: Record<string, unknown>) => api.post('/attendance/mark', data),
   getReports: (studentId?: number, academicYear?: string) =>
     api.get('/attendance/reports', { params: { student_id: studentId, academic_year: academicYear } }),
   delete: (id: number) => api.delete(`/attendance/${id}`),
@@ -217,8 +217,8 @@ export const roomsAPI = {
   getAll: (roomType?: string, isAvailable?: boolean) =>
     api.get('/rooms', { params: { room_type: roomType, is_available: isAvailable } }),
   getById: (id: number) => api.get(`/rooms/${id}`),
-  create: (data: any) => api.post('/rooms', data),
-  update: (id: number, data: any) => api.put(`/rooms/${id}`, data),
+  create: (data: Record<string, unknown>) => api.post('/rooms', data),
+  update: (id: number, data: Record<string, unknown>) => api.put(`/rooms/${id}`, data),
   delete: (id: number) => api.delete(`/rooms/${id}`),
 };
 
@@ -228,8 +228,8 @@ export const roomsAPI = {
 export const holidaysAPI = {
   getAll: (academicYear?: string) => api.get('/holidays', { params: { academic_year: academicYear } }),
   getById: (id: number) => api.get(`/holidays/${id}`),
-  create: (data: any) => api.post('/holidays', data),
-  update: (id: number, data: any) => api.put(`/holidays/${id}`, data),
+  create: (data: Record<string, unknown>) => api.post('/holidays', data),
+  update: (id: number, data: Record<string, unknown>) => api.put(`/holidays/${id}`, data),
   delete: (id: number) => api.delete(`/holidays/${id}`),
 };
 
@@ -239,8 +239,8 @@ export const holidaysAPI = {
 export const departmentsAPI = {
   getAll: () => api.get('/departments'),
   getById: (id: number) => api.get(`/departments/${id}`),
-  create: (data: any) => api.post('/departments', data),
-  update: (id: number, data: any) => api.put(`/departments/${id}`, data),
+  create: (data: Record<string, unknown>) => api.post('/departments', data),
+  update: (id: number, data: Record<string, unknown>) => api.put(`/departments/${id}`, data),
   delete: (id: number) => api.delete(`/departments/${id}`),
 };
 
@@ -249,7 +249,7 @@ export const departmentsAPI = {
 // ============================================
 export const staffAvailabilityAPI = {
   getAll: () => api.get('/staff-availability'),
-  create: (data: any) => api.post('/staff-availability', data),
+  create: (data: Record<string, unknown>) => api.post('/staff-availability', data),
   delete: (id: number) => api.delete(`/staff-availability/${id}`),
 };
 
@@ -258,6 +258,6 @@ export const staffAvailabilityAPI = {
 // ============================================
 export const staffDeptMapAPI = {
   getAll: () => api.get('/staff-dept-map'),
-  create: (data: any) => api.post('/staff-dept-map', data),
+  create: (data: Record<string, unknown>) => api.post('/staff-dept-map', data),
   delete: (id: number) => api.delete(`/staff-dept-map/${id}`),
 };

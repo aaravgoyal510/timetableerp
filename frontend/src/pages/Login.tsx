@@ -25,8 +25,9 @@ export const Login: React.FC = () => {
 
       await login(id, pin);
       navigate('/dashboard');
-    } catch (err: any) {
-      setError(err.message || 'Login failed. Please check your Staff ID and PIN.');
+    } catch (err: unknown) {
+      const error = err as Error;
+      setError(error.message || 'Login failed. Please check your Staff ID and PIN.');
       setIsLoading(false);
     }
   };

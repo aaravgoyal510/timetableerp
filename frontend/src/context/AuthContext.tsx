@@ -79,8 +79,9 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       localStorage.setItem('staff', JSON.stringify(response.data.staff));
       
       setStaff(response.data.staff);
-    } catch (error: any) {
-      throw new Error(error.response?.data?.error || 'Login failed');
+    } catch (error: unknown) {
+      const err = error as { response?: { data?: { error?: string } } };
+      throw new Error(err.response?.data?.error || 'Login failed');
     }
   };
 
@@ -122,6 +123,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   );
 };
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (!context) {
