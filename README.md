@@ -70,20 +70,43 @@ npm run start:production
 
 ## 📋 Available Commands
 
+### Development
 | Command | Description |
 |---------|-------------|
 | `npm install` | Install all dependencies (one command for everything) |
 | `npm run dev` | Start development mode (frontend + backend) |
 | `npm run dev:backend` | Start only backend server (port 5000) |
 | `npm run dev:frontend` | Start only frontend server (port 3000) |
+
+### Building
+| Command | Description |
+|---------|-------------|
 | `npm run build` | Build frontend for production |
-| `npm run build:production` | Clean build everything |
+| `npm run build:production` | Clean + build everything |
+| `npm run clean` | Remove build outputs |
+
+### Production
+| Command | Description |
+|---------|-------------|
 | `npm run start` | Start backend only |
 | `npm run start:production` | Start unified production server |
-| `npm test` | Run all tests |
-| `npm run clean` | Remove build outputs |
 | `npm run preview` | Preview production build |
-| `npm run deploy:prepare` | Prepare for deployment |
+
+### Validation & Quality
+| Command | Description |
+|---------|-------------|
+| `npm run validate` | Run all checks (lint + type-check + build) |
+| `npm run pre-push` | Same as validate (for pre-push validation) |
+| `npm run lint` | Check code quality with ESLint |
+| `npm run lint:fix` | Auto-fix linting issues |
+| `npm run lint:strict` | Strict linting (no warnings allowed) |
+| `npm run type-check` | Validate TypeScript types |
+
+### Testing & Deployment
+| Command | Description |
+|---------|-------------|
+| `npm test` | Run all tests |
+| `npm run deploy:prepare` | Prepare for deployment (clean + build) |
 
 ## 🗄️ Database Schema
 
@@ -153,6 +176,48 @@ All endpoints are prefixed with `/api`:
 - **Package Manager**: npm workspaces
 - **Process Manager**: Concurrently
 - **Environment**: cross-env
+
+### Quality Assurance
+- **Linting**: ESLint with TypeScript & React plugins
+- **Type Safety**: TypeScript strict mode
+- **Pre-Push Validation**: Automated lint + type-check + build
+- **Code Style**: ESLint configured for React best practices
+
+## 🛡️ Pre-Push Validation
+
+This project has **comprehensive automated validation** to prevent deployment crashes:
+
+### Automatic Checks (on every `git push`)
+
+1. **ESLint** - Code quality and style checking
+2. **TypeScript** - Type safety validation  
+3. **Build** - Full production compilation (mirrors Vercel)
+
+### How It Works
+
+```bash
+git push
+# → Automatically runs: lint → type-check → build
+# → If ANY fail: Push is ABORTED ❌
+# → If ALL pass: Push proceeds ✅
+```
+
+### Manual Validation
+
+```bash
+npm run validate    # Run all checks manually
+npm run pre-push    # Same as validate
+npm run lint:fix    # Auto-fix linting issues
+```
+
+### Benefits
+
+- ✅ **Prevent Vercel crashes** - Catch build errors before deployment
+- ✅ **Type safety** - No runtime type errors
+- ✅ **Code quality** - Consistent style and best practices
+- ✅ **Fast feedback** - Find issues locally, not in production
+
+📖 **See [VALIDATION.md](VALIDATION.md) for complete guide**
 
 ## ⚙️ Configuration
 
