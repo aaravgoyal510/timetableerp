@@ -76,6 +76,13 @@ npm run preview          # Preview production build
 npm run deploy:prepare   # Prepare for deployment (clean + build)
 ```
 
+### Pre-Push Validation
+```bash
+npm run pre-push         # Validate build before pushing to GitHub
+```
+
+**Note**: A git pre-push hook automatically runs the build before every push to prevent deployment crashes.
+
 ---
 
 ## 🚀 Deployment Options

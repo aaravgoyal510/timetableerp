@@ -24,7 +24,8 @@
     "check": "concurrently \"npm run check:backend\" \"npm run check:frontend\"",
     "check:backend": "node backend/src/server.js --check || echo Backend check complete",
     "check:frontend": "npm run build --workspace=frontend",
-    "deploy:prepare": "npm run clean && npm run build:frontend && echo ✅ Project ready for deployment"
+    "deploy:prepare": "npm run clean && npm run build:frontend && echo ✅ Project ready for deployment",
+    "pre-push": "npm run build && echo ✅ Build validated - safe to push"
   },
   "keywords": ["timetable", "erp", "management"],
   "author": "",
