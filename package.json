@@ -18,18 +18,18 @@
     "start:production": "cross-env NODE_ENV=production npm run start --workspace=backend",
     "test": "npm run test --workspaces --if-present",
     "test:backend": "npm run test --workspace=backend",
-    "lint": "npm run lint --workspace=frontend",
+    "lint": "npm run lint --workspace=frontend && echo ✅ Frontend linting passed",
     "lint:fix": "npm run lint:fix --workspace=frontend",
-    "type-check": "npm run type-check --workspace=frontend",
-    "validate": "npm run lint && npm run type-check && npm run build",
+    "type-check": "npm run type-check --workspace=frontend && echo ✅ Frontend type checking passed",
+    "validate": "npm run lint && npm run type-check && npm run build && npm run check:backend",
     "clean": "node -e \"const fs=require('fs'); const path='frontend/dist'; if(fs.existsSync(path)) fs.rmSync(path, {recursive:true}); console.log('✅ Cleaned build outputs')\"",
     "postinstall": "echo ✅ All dependencies installed successfully!",
     "preview": "npm run preview --workspace=frontend",
     "check": "concurrently \"npm run check:backend\" \"npm run check:frontend\"",
-    "check:backend": "node backend/src/server.js --check || echo Backend check complete",
+    "check:backend": "node check-backend.js",
     "check:frontend": "npm run build --workspace=frontend",
     "deploy:prepare": "npm run clean && npm run build:frontend && echo ✅ Project ready for deployment",
-    "pre-push": "npm run validate && echo ✅ All checks passed - safe to push"
+    "pre-push": "npm run validate && echo ✅ ALL CHECKS PASSED - safe to push"
   },
   "keywords": [
     "timetable",
