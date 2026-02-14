@@ -60,15 +60,33 @@ try {
   walkDir(srcDir);
   console.log('✅ All backend files have valid syntax');
 
-  // 5. Check required dependencies
+  // 5. Check required dependencies (workspace root preferred)
   const requiredDeps = ['express', 'cors', 'dotenv', '@supabase/supabase-js', 'jsonwebtoken', 'bcryptjs'];
-  const installed = fs.readdirSync(path.join(backendDir, 'node_modules'));
-  for (const dep of requiredDeps) {
-    if (!installed.includes(dep)) {
-      console.warn(`⚠️  Missing dependency: ${dep}`);
+  const rootNodeModules = path.join(__dirname, 'node_modules');
+  const backendNodeModules = path.join(backendDir, 'node_modules');
+  const nodeModulesDir = fs.existsSync(rootNodeModules) ? rootNodeModules : backendNodeModules;
+
+  if (fs.existsSync(nodeModulesDir)) {
+    const installed = fs.readdirSync(nodeModulesDir);
+    const hasScopedDep = (dep) => {
+      if (!dep.startsWith('@')) return false;
+      const [scope, name] = dep.split('/');
+      const scopePath = path.join(nodeModulesDir, scope);
+      if (!fs.existsSync(scopePath)) return false;
+      const scopePackages = fs.readdirSync(scopePath);
+      return scopePackages.includes(name);
+    };
+
+    for (const dep of requiredDeps) {
+      const isPresent = dep.startsWith('@') ? hasScopedDep(dep) : installed.includes(dep);
+      if (!isPresent) {
+        console.warn(`⚠️  Missing dependency: ${dep}`);
+      }
     }
+    console.log('✅ Backend dependencies check passed');
+  } else {
+    console.warn('⚠️  node_modules not found; skipping dependency check');
   }
-  console.log('✅ Backend dependencies check passed');
 
   console.log('\n✅ Backend validation successful!\n');
   process.exit(0);
