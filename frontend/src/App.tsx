@@ -5,25 +5,25 @@ import { ProtectedRoute } from './components/ProtectedRoute';
 import { Layout } from './components/Layout';
 import './index.css';
 
-const Dashboard = lazy(() => import('./pages/Dashboard'));
-const Students = lazy(() => import('./pages/Students'));
-const Staff = lazy(() => import('./pages/Staff'));
-const Classes = lazy(() => import('./pages/Classes'));
-const Subjects = lazy(() => import('./pages/Subjects'));
-const Timeslots = lazy(() => import('./pages/Timeslots'));
-const Rooms = lazy(() => import('./pages/Rooms'));
-const Timetable = lazy(() => import('./pages/Timetable'));
-const Attendance = lazy(() => import('./pages/Attendance'));
-const RoomAllotment = lazy(() => import('./pages/RoomAllotment'));
-const Holidays = lazy(() => import('./pages/Holidays'));
-const Roles = lazy(() => import('./pages/Roles'));
-const Departments = lazy(() => import('./pages/Departments'));
-const StaffRoleMap = lazy(() => import('./pages/StaffRoleMap'));
-const StaffDeptMap = lazy(() => import('./pages/StaffDeptMap'));
-const StudentRoleMap = lazy(() => import('./pages/StudentRoleMap'));
-const TeacherSubjectMap = lazy(() => import('./pages/TeacherSubjectMap'));
-const StaffAvailability = lazy(() => import('./pages/StaffAvailability'));
-const Login = lazy(() => import('./pages/Login'));
+const Dashboard = lazy(() => import('./pages/Dashboard').then((m) => ({ default: m.Dashboard })));
+const Students = lazy(() => import('./pages/Students').then((m) => ({ default: m.Students })));
+const Staff = lazy(() => import('./pages/Staff').then((m) => ({ default: m.Staff })));
+const Classes = lazy(() => import('./pages/Classes').then((m) => ({ default: m.Classes })));
+const Subjects = lazy(() => import('./pages/Subjects').then((m) => ({ default: m.Subjects })));
+const Timeslots = lazy(() => import('./pages/Timeslots').then((m) => ({ default: m.Timeslots })));
+const Rooms = lazy(() => import('./pages/Rooms').then((m) => ({ default: m.Rooms })));
+const Timetable = lazy(() => import('./pages/Timetable').then((m) => ({ default: m.Timetable })));
+const Attendance = lazy(() => import('./pages/Attendance').then((m) => ({ default: m.Attendance })));
+const RoomAllotment = lazy(() => import('./pages/RoomAllotment').then((m) => ({ default: m.RoomAllotment })));
+const Holidays = lazy(() => import('./pages/Holidays').then((m) => ({ default: m.Holidays })));
+const Roles = lazy(() => import('./pages/Roles').then((m) => ({ default: m.Roles })));
+const Departments = lazy(() => import('./pages/Departments').then((m) => ({ default: m.Departments })));
+const StaffRoleMap = lazy(() => import('./pages/StaffRoleMap').then((m) => ({ default: m.StaffRoleMap })));
+const StaffDeptMap = lazy(() => import('./pages/StaffDeptMap').then((m) => ({ default: m.StaffDeptMap })));
+const StudentRoleMap = lazy(() => import('./pages/StudentRoleMap').then((m) => ({ default: m.StudentRoleMap })));
+const TeacherSubjectMap = lazy(() => import('./pages/TeacherSubjectMap').then((m) => ({ default: m.TeacherSubjectMap })));
+const StaffAvailability = lazy(() => import('./pages/StaffAvailability').then((m) => ({ default: m.StaffAvailability })));
+const Login = lazy(() => import('./pages/Login').then((m) => ({ default: m.Login })));
 
 function LoadingFallback() {
   return (
