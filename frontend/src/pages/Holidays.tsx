@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import type { AxiosError } from 'axios';
 import { holidaysAPI } from '../api';
 import { Plus, Trash2, Calendar } from 'lucide-react';
 
@@ -13,6 +14,8 @@ export const Holidays: React.FC = () => {
   const [holidays, setHolidays] = useState<Holiday[]>([]);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState<string | null>(null);
   
   const [formData, setFormData] = useState({
     holiday_date: '',
@@ -37,20 +40,29 @@ export const Holidays: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError(null);
+    setSuccess(null);
     
     try {
       setSubmitting(true);
       await holidaysAPI.create(formData);
       
+      setSuccess('Holiday added successfully!');
       setFormData({
         holiday_date: '',
         holiday_name: '',
         description: ''
       });
       
-      fetchHolidays();
-    } catch (error) {
+      setTimeout(() => {
+        fetchHolidays();
+        setSuccess(null);
+      }, 1500);
+    } catch (error: unknown) {
       console.error('Error creating holiday:', error);
+      const axiosError = error as AxiosError<Record<string, unknown>>;
+      const errorMessage = axiosError.response?.data?.error || (error instanceof Error ? error.message : 'Failed to create holiday');
+      setError(typeof errorMessage === 'string' ? errorMessage : 'Failed to create holiday');
     } finally {
       setSubmitting(false);
     }
@@ -99,6 +111,22 @@ export const Holidays: React.FC = () => {
           <span>➕</span>
           Add New Holiday
         </h2>
+        
+        {/* Error Alert */}
+        {error && (
+          <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-4">
+            <p className="text-red-800 font-semibold">Error</p>
+            <p className="text-red-700 text-sm mt-1">{error}</p>
+            <button onClick={() => setError(null)} className="text-red-700 text-xs mt-2 hover:text-red-900 underline">Dismiss</button>
+          </div>
+        )}
+        
+        {success && (
+          <div className="bg-green-50 border border-green-200 rounded-lg p-4 mb-4">
+            <p className="text-green-800 font-semibold">✓ {success}</p>
+          </div>
+        )}
+        
         <form onSubmit={handleSubmit} className="space-y-4">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>

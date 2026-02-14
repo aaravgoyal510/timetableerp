@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import type { AxiosError } from 'axios';
 import { api } from '../api';
 
 interface StaffRoleMapping {
@@ -26,6 +27,8 @@ export const StaffRoleMap: React.FC = () => {
   const [roles, setRoles] = useState<Role[]>([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState<string | null>(null);
   const [formData, setFormData] = useState({
     staff_id: '',
     role_id: '',
@@ -58,14 +61,23 @@ export const StaffRoleMap: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError(null);
+    setSuccess(null);
+    
     try {
       await api.post('/staff-role-map', formData);
+      setSuccess('Role assigned to staff successfully!');
       setFormData({ staff_id: '', role_id: '', is_active: true });
       setShowForm(false);
-      fetchData();
-    } catch (error) {
+      setTimeout(() => {
+        fetchData();
+        setSuccess(null);
+      }, 1500);
+    } catch (error: unknown) {
       console.error('Error creating mapping:', error);
-      alert('Failed to create mapping');
+      const axiosError = error as AxiosError<Record<string, unknown>>;
+      const errorMessage = axiosError.response?.data?.error || (error instanceof Error ? error.message : 'Failed to assign role');
+      setError(typeof errorMessage === 'string' ? errorMessage : 'Failed to assign role');
     }
   };
 
@@ -84,6 +96,21 @@ export const StaffRoleMap: React.FC = () => {
 
   return (
     <div className="space-y-6">
+      {/* Error Alert */}
+      {error && (
+        <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+          <p className="text-red-800 font-semibold">Error</p>
+          <p className="text-red-700 text-sm mt-1">{error}</p>
+          <button onClick={() => setError(null)} className="text-red-700 text-xs mt-2 hover:text-red-900 underline">Dismiss</button>
+        </div>
+      )}
+      
+      {success && (
+        <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+          <p className="text-green-800 font-semibold">✓ {success}</p>
+        </div>
+      )}
+      
       <h1 className="text-4xl font-bold text-gray-800">Staff & Roles</h1>
       
       <button

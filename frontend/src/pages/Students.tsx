@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import type { AxiosError } from 'axios';
 import { studentsAPI, classesAPI } from '../api';
 import { Plus, Trash2, GraduationCap } from 'lucide-react';
 
@@ -28,6 +29,8 @@ export const Students: React.FC = () => {
   const [classes, setClasses] = useState<Class[]>([]);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState<string | null>(null);
   
   const currentYear = new Date().getFullYear();
   const [formData, setFormData] = useState({
@@ -82,7 +85,7 @@ export const Students: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!formData.class_id) {
-      alert('Please select a class');
+      setError('Please select a a class');
       return;
     }
 
@@ -94,7 +97,7 @@ export const Students: React.FC = () => {
         admission_year: parseInt(formData.admission_year)
       });
       
-      // Reset form but keep admission year and batch
+      setSuccess('Student added successfully!');
       setFormData({
         roll_number: '',
         student_name: '',
@@ -105,9 +108,15 @@ export const Students: React.FC = () => {
         class_id: formData.class_id
       });
       
-      fetchData();
-    } catch (error) {
+      setTimeout(() => {
+        fetchData();
+        setSuccess(null);
+      }, 1500);
+    } catch (error: unknown) {
       console.error('Error creating student:', error);
+      const axiosError = error as AxiosError<Record<string, unknown>>;
+      const errorMessage = axiosError.response?.data?.error || (error instanceof Error ? error.message : 'Failed to create student');
+      setError(typeof errorMessage === 'string' ? errorMessage : 'Failed to create student');
     } finally {
       setSubmitting(false);
     }
@@ -139,6 +148,21 @@ export const Students: React.FC = () => {
 
   return (
     <div className="space-y-6">
+      {/* Error Alert */}
+      {error && (
+        <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+          <p className="text-red-800 font-semibold">Error</p>
+          <p className="text-red-700 text-sm mt-1">{error}</p>
+          <button onClick={() => setError(null)} className="text-red-700 text-xs mt-2 hover:text-red-900 underline">Dismiss</button>
+        </div>
+      )}
+      
+      {success && (
+        <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+          <p className="text-green-800 font-semibold">✓ {success}</p>
+        </div>
+      )}
+      
       {/* Header */}
       <div className="bg-white rounded-xl shadow-sm p-6">
         <h1 className="text-3xl font-bold text-gray-900 mb-2">👨‍🎓 Students</h1>

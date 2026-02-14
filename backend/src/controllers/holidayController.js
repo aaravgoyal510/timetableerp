@@ -30,11 +30,24 @@ const getHolidayById = async (req, res) => {
 
 const createHoliday = async (req, res) => {
   try {
-    const { holiday_date, holiday_name } = req.body;
+    const { holiday_date, holiday_name, description } = req.body;
+    
+    // Validation
+    if (!holiday_date || !holiday_date.trim()) {
+      return res.status(422).json({ error: 'Holiday date is required.' });
+    }
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(holiday_date)) {
+      return res.status(422).json({ error: 'Holiday date must be in YYYY-MM-DD format.' });
+    }
+    if (!holiday_name || !holiday_name.trim()) {
+      return res.status(422).json({ error: 'Holiday name is required.' });
+    }
+    
     const { data, error } = await supabase.from('holidays').insert([
       {
         holiday_date,
-        holiday_name
+        holiday_name: holiday_name.trim(),
+        description: description?.trim() || ''
       }
     ]).select();
     if (error) throw error;

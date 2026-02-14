@@ -32,12 +32,30 @@ const getClassById = async (req, res) => {
 const createClass = async (req, res) => {
   try {
     const { course_name, semester, section, academic_year, shift } = req.body;
+    
+    // Validation
+    if (!course_name || !course_name.trim()) {
+      return res.status(422).json({ error:  'Course name is required.' });
+    }
+    if (!semester || semester < 1 || semester > 8) {
+      return res.status(422).json({ error: 'Semester must be between 1 and 8.' });
+    }
+    if (!section || !section.trim() || section.length !== 1) {
+      return res.status(422).json({ error: 'Section must be a single letter.' });
+    }
+    if (!academic_year || !academic_year.trim()) {
+      return res.status(422).json({ error: 'Academic year is required.' });
+    }
+    if (!['Morning', 'Evening'].includes(shift)) {
+      return res.status(422).json({ error: 'Shift must be Morning or Evening.' });
+    }
+    
     const { data, error } = await supabase.from('classes').insert([
       {
-        course_name,
-        semester,
-        section,
-        academic_year,
+        course_name: course_name.trim(),
+        semester: parseInt(semester),
+        section: section.trim().toUpperCase(),
+        academic_year: academic_year.trim(),
         shift,
         student_count: 0,
         is_active: true

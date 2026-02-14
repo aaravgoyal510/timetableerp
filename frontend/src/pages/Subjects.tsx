@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import type { AxiosError } from 'axios';
 import { subjectsAPI, departmentsAPI } from '../api';
 import { Plus, Trash2 } from 'lucide-react';
 
@@ -25,6 +26,8 @@ export const Subjects: React.FC = () => {
   const [departments, setDepartments] = useState<Department[]>([]);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState<string | null>(null);
   
   const [formData, setFormData] = useState({
     subject_code: '',
@@ -59,8 +62,11 @@ export const Subjects: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError(null);
+    setSuccess(null);
+    
     if (!formData.department_id) {
-      alert('Please select a department');
+      setError('Please select a department');
       return;
     }
 
@@ -75,6 +81,7 @@ export const Subjects: React.FC = () => {
         duration_years: parseInt(formData.duration_years),
       });
       
+      setSuccess('Subject added successfully!');
       setFormData({
         subject_code: '',
         subject_name: '',
@@ -87,9 +94,15 @@ export const Subjects: React.FC = () => {
         duration_years: '1',
       });
       
-      fetchData();
-    } catch (error) {
+      setTimeout(() => {
+        fetchData();
+        setSuccess(null);
+      }, 1500);
+    } catch (error: unknown) {
       console.error('Error creating subject:', error);
+      const axiosError = error as AxiosError<Record<string, unknown>>;
+      const errorMessage = axiosError.response?.data?.error || (error instanceof Error ? error.message : 'Failed to create subject');
+      setError(typeof errorMessage === 'string' ? errorMessage : 'Failed to create subject');
     } finally {
       setSubmitting(false);
     }
@@ -120,6 +133,21 @@ export const Subjects: React.FC = () => {
 
   return (
     <div className="space-y-6">
+      {/* Error Alert */}
+      {error && (
+        <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+          <p className="text-red-800 font-semibold">Error</p>
+          <p className="text-red-700 text-sm mt-1">{error}</p>
+          <button onClick={() => setError(null)} className="text-red-700 text-xs mt-2 hover:text-red-900 underline">Dismiss</button>
+        </div>
+      )}
+      
+      {success && (
+        <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+          <p className="text-green-800 font-semibold">✓ {success}</p>
+        </div>
+      )}
+      
       {/* Header */}
       <div className="bg-white rounded-xl shadow-sm p-6">
         <h1 className="text-3xl font-bold text-gray-900">Subjects</h1>

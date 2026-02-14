@@ -50,17 +50,44 @@ const getStudentById = async (req, res) => {
 const createStudent = async (req, res) => {
   try {
     const { roll_number, student_name, email, phone_number, admission_year, batch, class_id } = req.body;
+    
+    // Validation
+    if (!roll_number || !roll_number.trim()) {
+      return res.status(422).json({ error: 'Roll number is required.' });
+    }
+    if (!student_name || !student_name.trim()) {
+      return res.status(422).json({ error: 'Student name is required.' });
+    }
+    if (!email || !email.trim()) {
+      return res.status(422).json({ error: 'Email is required.' });
+    }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      return res.status(422).json({ error: 'Please provide a valid email address.' });
+    }
+    if (!phone_number || !phone_number.trim()) {
+      return res.status(422).json({ error: 'Phone number is required.' });
+    }
+    if (!/^[0-9]{10}$/.test(phone_number.toString())) {
+      return res.status(422).json({ error: 'Phone number must be 10 digits.' });
+    }
+    if (!admission_year) {
+      return res.status(422).json({ error: 'Admission year is required.' });
+    }
+    if (!batch || !batch.trim()) {
+      return res.status(422).json({ error: 'Batch is required.' });
+    }
     if (!class_id) {
       return res.status(422).json({ error: 'class_id is required for student enrollment.' });
     }
+    
     const { data, error } = await supabase.from('students').insert([
       {
-        roll_number,
-        student_name,
-        email,
-        phone_number,
-        admission_year,
-        batch,
+        roll_number: roll_number.trim().toUpperCase(),
+        student_name: student_name.trim(),
+        email: email.trim().toLowerCase(),
+        phone_number: phone_number.toString(),
+        admission_year: parseInt(admission_year),
+        batch: batch.trim(),
         class_id,
         is_active: true
       }

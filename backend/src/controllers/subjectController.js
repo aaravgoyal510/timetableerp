@@ -32,17 +32,38 @@ const getSubjectByCode = async (req, res) => {
 const createSubject = async (req, res) => {
   try {
     const { subject_code, subject_name, course_name, department_id, semester, credits, hours_per_week, is_lab, duration_years } = req.body;
+    
+    // Validation
+    if (!subject_code || !subject_code.trim()) {
+      return res.status(422).json({ error: 'Subject code is required.' });
+    }
+    if (!subject_name || !subject_name.trim()) {
+      return res.status(422).json({ error: 'Subject name is required.' });
+    }
+    if (!department_id) {
+      return res.status(422).json({ error: 'Department is required.' });
+    }
+    if (!semester || semester < 1 || semester > 8) {
+      return res.status(422).json({ error: 'Semester must be between 1 and 8.' });
+    }
+    if (!credits || credits < 1 || credits > 10) {
+      return res.status(422).json({ error: 'Credits must be between 1 and 10.' });
+    }
+    if (!hours_per_week || hours_per_week < 1) {
+      return res.status(422).json({ error: 'Hours per week must be at least 1.' });
+    }
+    
     const { data, error } = await supabase.from('subjects_master').insert([
       {
-        subject_code,
-        subject_name,
-        course_name,
+        subject_code: subject_code.trim().toUpperCase(),
+        subject_name: subject_name.trim(),
+        course_name: course_name?.trim() || '',
         department_id,
-        semester,
-        credits,
-        hours_per_week,
+        semester: parseInt(semester),
+        credits: parseInt(credits),
+        hours_per_week: parseInt(hours_per_week),
         is_lab: is_lab || false,
-        duration_years,
+        duration_years: parseInt(duration_years || 1),
         is_active: true
       }
     ]).select();

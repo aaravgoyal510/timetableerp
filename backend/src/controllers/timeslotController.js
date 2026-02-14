@@ -32,12 +32,31 @@ const getTimeslotById = async (req, res) => {
 const createTimeslot = async (req, res) => {
   try {
     const { day_of_week, start_time, end_time, slot_number, is_break, shift } = req.body;
+    
+    // Validation
+    const validDays = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+    if (!day_of_week || !validDays.includes(day_of_week)) {
+      return res.status(422).json({ error: 'Invalid day of week.' });
+    }
+    if (!start_time || !/^\d{2}:\d{2}$/.test(start_time)) {
+      return res.status(422).json({ error: 'Start time must be in HH:MM format.' });
+    }
+    if (!end_time || !/^\d{2}:\d{2}$/.test(end_time)) {
+      return res.status(422).json({ error: 'End time must be in HH:MM format.' });
+    }
+    if (start_time >= end_time) {
+      return res.status(422).json({ error: 'End time must be after start time.' });
+    }
+    if (!shift || !['Morning', 'Evening'].includes(shift)) {
+      return res.status(422).json({ error: 'Shift must be Morning or Evening.' });
+    }
+    
     const { data, error } = await supabase.from('timeslots').insert([
       {
         day_of_week,
         start_time,
         end_time,
-        slot_number,
+        slot_number: slot_number || 1,
         is_break: is_break || false,
         shift
       }

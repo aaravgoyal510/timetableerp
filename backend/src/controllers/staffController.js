@@ -32,13 +32,40 @@ const getStaffById = async (req, res) => {
 const createStaff = async (req, res) => {
   try {
     const { staff_name, email, phone_number, department_id, designation, staff_type } = req.body;
+    
+    // Validation
+    if (!staff_name || !staff_name.trim()) {
+      return res.status(422).json({ error: 'Staff name is required.' });
+    }
+    if (!email || !email.trim()) {
+      return res.status(422).json({ error: 'Email is required.' });
+    }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      return res.status(422).json({ error: 'Please provide a valid email address.' });
+    }
+    if (!phone_number || !phone_number.trim()) {
+      return res.status(422).json({ error: 'Phone number is required.' });
+    }
+    if (!/^[0-9]{10}$/.test(phone_number.toString())) {
+      return res.status(422).json({ error: 'Phone number must be 10 digits.' });
+    }
+    if (!designation || !designation.trim()) {
+      return res.status(422).json({ error: 'Designation is required.' });
+    }
+    if (!['Permanent', 'Visiting', 'Contract'].includes(staff_type)) {
+      return res.status(422).json({ error: 'Invalid staff type. Must be Permanent, Visiting, or Contract.' });
+    }
+    if (!department_id) {
+      return res.status(422).json({ error: 'Department is required.' });
+    }
+    
     const { data, error } = await supabase.from('staff').insert([
       {
-        staff_name,
-        email,
-        phone_number,
+        staff_name: staff_name.trim(),
+        email: email.trim().toLowerCase(),
+        phone_number: phone_number.toString(),
         department_id,
-        designation,
+        designation: designation.trim(),
         staff_type,
         is_active: true
       }

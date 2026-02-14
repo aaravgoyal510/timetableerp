@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import type { AxiosError } from 'axios';
 import { timeslotAPI } from '../api';
 
 interface Timeslot {
@@ -15,6 +16,8 @@ export const Timeslots: React.FC = () => {
   const [timeslots, setTimeslots] = useState<Timeslot[]>([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState<string | null>(null);
   const [formData, setFormData] = useState({
     day_of_week: 'Monday',
     start_time: '09:00',
@@ -42,8 +45,12 @@ export const Timeslots: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError(null);
+    setSuccess(null);
+    
     try {
       await timeslotAPI.create(formData);
+      setSuccess('Timeslot added successfully!');
       setFormData({
         day_of_week: 'Monday',
         start_time: '09:00',
@@ -53,9 +60,15 @@ export const Timeslots: React.FC = () => {
         shift: 'Morning',
       });
       setShowForm(false);
-      fetchTimeslots();
-    } catch (error) {
+      setTimeout(() => {
+        fetchTimeslots();
+        setSuccess(null);
+      }, 1500);
+    } catch (error: unknown) {
       console.error('Error creating timeslot:', error);
+      const axiosError = error as AxiosError<Record<string, unknown>>;
+      const errorMessage = axiosError.response?.data?.error || (error instanceof Error ? error.message : 'Failed to create timeslot');
+      setError(typeof errorMessage === 'string' ? errorMessage : 'Failed to create timeslot');
     }
   };
 
@@ -74,6 +87,21 @@ export const Timeslots: React.FC = () => {
 
   return (
     <div className="space-y-6">
+      {/* Error Alert */}
+      {error && (
+        <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+          <p className="text-red-800 font-semibold">Error</p>
+          <p className="text-red-700 text-sm mt-1">{error}</p>
+          <button onClick={() => setError(null)} className="text-red-700 text-xs mt-2 hover:text-red-900 underline">Dismiss</button>
+        </div>
+      )}
+      
+      {success && (
+        <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+          <p className="text-green-800 font-semibold">✓ {success}</p>
+        </div>
+      )}
+      
       {/* Header */}
       <div className="bg-white rounded-xl shadow-sm p-6">
         <div className="flex justify-between items-center">

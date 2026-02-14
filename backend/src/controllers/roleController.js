@@ -33,10 +33,19 @@ const getRoleById = async (req, res) => {
 const createRole = async (req, res) => {
   try {
     const { role_name, role_description } = req.body;
+    
+    // Validation
+    if (!role_name || !role_name.trim()) {
+      return res.status(422).json({ error: 'Role name is required.' });
+    }
+    if (role_name.trim().length < 3) {
+      return res.status(422).json({ error: 'Role name must be at least 3 characters.' });
+    }
+    
     const { data, error } = await supabase.from('roles_master').insert([
       {
-        role_name,
-        role_description,
+        role_name: role_name.trim(),
+        role_description: role_description?.trim() || '',
         is_active: true
       }
     ]).select();

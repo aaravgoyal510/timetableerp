@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import type { AxiosError } from 'axios';
 import { api } from '../api';
 
 interface StudentRoleMapping {
@@ -62,9 +63,11 @@ export const StudentRoleMap: React.FC = () => {
       setFormData({ student_id: '', role_id: '', is_active: true });
       setShowForm(false);
       fetchData();
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Error creating mapping:', error);
-      alert('Failed to create mapping');
+      const axiosError = error as AxiosError<Record<string, unknown>>;
+      const errorMessage = axiosError.response?.data?.error || (error instanceof Error ? error.message : 'Failed to create mapping');
+      alert(typeof errorMessage === 'string' ? errorMessage : 'Failed to create mapping');
     }
   };
 

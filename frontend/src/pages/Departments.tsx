@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import type { AxiosError } from 'axios';
 import { departmentsAPI } from '../api';
 import { Trash2 } from 'lucide-react';
 
@@ -12,6 +13,8 @@ export const Departments: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [name, setName] = useState('');
   const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState<string | null>(null);
 
   useEffect(() => {
     fetchDepartments();
@@ -30,15 +33,28 @@ export const Departments: React.FC = () => {
 
   const handleCreate = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!name.trim()) return;
+    setError(null);
+    setSuccess(null);
+    
+    if (!name.trim()) {
+      setError('Department name is required');
+      return;
+    }
 
     try {
       setSubmitting(true);
       await departmentsAPI.create({ name: name.trim() });
+      setSuccess('Department added successfully!');
       setName('');
-      fetchDepartments();
-    } catch (error) {
+      setTimeout(() => {
+        fetchDepartments();
+        setSuccess(null);
+      }, 1500);
+    } catch (error: unknown) {
       console.error('Error creating department:', error);
+      const axiosError = error as AxiosError<Record<string, unknown>>;
+      const errorMessage = axiosError.response?.data?.error || (error instanceof Error ? error.message : 'Failed to create department');
+      setError(typeof errorMessage === 'string' ? errorMessage : 'Failed to create department');
     } finally {
       setSubmitting(false);
     }
@@ -57,6 +73,21 @@ export const Departments: React.FC = () => {
 
   return (
     <div className="space-y-6">
+      {/* Error Alert */}
+      {error && (
+        <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+          <p className="text-red-800 font-semibold">Error</p>
+          <p className="text-red-700 text-sm mt-1">{error}</p>
+          <button onClick={() => setError(null)} className="text-red-700 text-xs mt-2 hover:text-red-900 underline">Dismiss</button>
+        </div>
+      )}
+      
+      {success && (
+        <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+          <p className="text-green-800 font-semibold">✓ {success}</p>
+        </div>
+      )}
+      
       {/* Header */}
       <div className="bg-white rounded-xl shadow-sm p-6">
         <h1 className="text-3xl font-bold text-gray-900">Departments</h1>

@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import type { AxiosError } from 'axios';
 import { roomsAPI } from '../api';
 import { Plus, Trash2, DoorOpen } from 'lucide-react';
 
@@ -20,6 +21,8 @@ export const Rooms: React.FC = () => {
   const [rooms, setRooms] = useState<Room[]>([]);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState<string | null>(null);
   
   const [formData, setFormData] = useState({
     room_number: '',
@@ -49,6 +52,8 @@ export const Rooms: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError(null);
+    setSuccess(null);
     
     try {
       setSubmitting(true);
@@ -60,6 +65,7 @@ export const Rooms: React.FC = () => {
         availability_status: 'Available'
       });
       
+      setSuccess('Room added successfully!');
       setFormData({
         room_number: '',
         room_type: formData.room_type,
@@ -71,9 +77,15 @@ export const Rooms: React.FC = () => {
         computer_count: formData.computer_count,
       });
       
-      fetchRooms();
-    } catch (error) {
+      setTimeout(() => {
+        fetchRooms();
+        setSuccess(null);
+      }, 1500);
+    } catch (error: unknown) {
       console.error('Error creating room:', error);
+      const axiosError = error as AxiosError<Record<string, unknown>>;
+      const errorMessage = axiosError.response?.data?.error || (error instanceof Error ? error.message : 'Failed to create room');
+      setError(typeof errorMessage === 'string' ? errorMessage : 'Failed to create room');
     } finally {
       setSubmitting(false);
     }
@@ -100,6 +112,21 @@ export const Rooms: React.FC = () => {
 
   return (
     <div className="space-y-6">
+      {/* Error Alert */}
+      {error && (
+        <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+          <p className="text-red-800 font-semibold">Error</p>
+          <p className="text-red-700 text-sm mt-1">{error}</p>
+          <button onClick={() => setError(null)} className="text-red-700 text-xs mt-2 hover:text-red-900 underline">Dismiss</button>
+        </div>
+      )}
+      
+      {success && (
+        <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+          <p className="text-green-800 font-semibold">✓ {success}</p>
+        </div>
+      )}
+      
       {/* Header */}
       <div className="bg-white rounded-xl shadow-sm p-6">
         <h1 className="text-3xl font-bold text-gray-900">Rooms</h1>

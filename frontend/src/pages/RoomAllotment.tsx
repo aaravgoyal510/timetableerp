@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import type { AxiosError } from 'axios';
 import { roomAllotmentAPI, roomsAPI as roomAPI, classesAPI as classAPI, staffAPI, subjectsAPI as subjectAPI, timeslotAPI } from '../api';
 import type { Room, Class, Staff, Subject, Timeslot } from '../types';
 
@@ -21,6 +22,8 @@ export const RoomAllotment: React.FC = () => {
   const [staff, setStaff] = useState<Staff[]>([]);
   const [subjects, setSubjects] = useState<Subject[]>([]);
   const [timeslots, setTimeslots] = useState<Timeslot[]>([]);
+  const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState<string | null>(null);
   const [formData, setFormData] = useState({
     room_id: 1,
     class_id: 1,
@@ -60,8 +63,12 @@ export const RoomAllotment: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError(null);
+    setSuccess(null);
+    
     try {
       await roomAllotmentAPI.create(formData);
+      setSuccess('Room allotment created successfully!');
       setFormData({
         room_id: 1,
         class_id: 1,
@@ -71,9 +78,15 @@ export const RoomAllotment: React.FC = () => {
         allotment_date: '',
       });
       setShowForm(false);
-      fetchAllData();
-    } catch (error) {
+      setTimeout(() => {
+        fetchAllData();
+        setSuccess(null);
+      }, 1500);
+    } catch (error: unknown) {
       console.error('Error creating allotment:', error);
+      const axiosError = error as AxiosError<Record<string, unknown>>;
+      const errorMessage = axiosError.response?.data?.error || (error instanceof Error ? error.message : 'Failed to create allotment');
+      setError(typeof errorMessage === 'string' ? errorMessage : 'Failed to create allotment');
     }
   };
 
@@ -90,6 +103,21 @@ export const RoomAllotment: React.FC = () => {
 
   return (
     <div className="space-y-6">
+      {/* Error Alert */}
+      {error && (
+        <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+          <p className="text-red-800 font-semibold">Error</p>
+          <p className="text-red-700 text-sm mt-1">{error}</p>
+          <button onClick={() => setError(null)} className="text-red-700 text-xs mt-2 hover:text-red-900 underline">Dismiss</button>
+        </div>
+      )}
+      
+      {success && (
+        <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+          <p className="text-green-800 font-semibold">✓ {success}</p>
+        </div>
+      )}
+      
       {/* Header */}
       <div className="bg-white rounded-xl shadow-sm p-6">
         <div className="flex justify-between items-center">

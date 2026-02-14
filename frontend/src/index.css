@@ -1,5 +1,3 @@
-@import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Work+Sans:wght@400;500;600;700&display=swap');
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -11,83 +9,226 @@
 }
 
 :root {
-  --ink: #1f2428;
-  --cream: #f4efe7;
-  --paper: #fbf9f3;
-  --teal: #2b8c8c;
-  --teal-dark: #1d6b6b;
-  --muted: #6b6b63;
-  --line: rgba(31, 36, 40, 0.12);
-  --shadow: 0 18px 40px rgba(31, 36, 40, 0.12);
+  --primary-color: #2563eb;
+  --primary-dark: #1d4ed8;
+  --primary-light: #3b82f6;
+  --secondary-color: #64748b;
+  --background: #f8fafc;
+  --surface: #ffffff;
+  --border: #e2e8f0;
+  --text-primary: #1e293b;
+  --text-secondary: #64748b;
+}
+
+html {
+  scroll-behavior: smooth;
 }
 
 body {
-  font-family: 'Work Sans', 'Segoe UI', sans-serif;
-  color: var(--ink);
-  background-color: var(--cream);
-  background-image:
-    radial-gradient(circle at top left, rgba(43, 140, 140, 0.12), transparent 55%),
-    radial-gradient(circle at 10% 40%, rgba(31, 36, 40, 0.08), transparent 45%);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  background-color: var(--background);
+  color: var(--text-primary);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-h1, h2, h3, h4, .display {
-  font-family: 'DM Serif Display', 'Times New Roman', serif;
-  letter-spacing: 0.2px;
+/* Typography */
+h1, h2, h3, h4, h5, h6 {
+  font-weight: 600;
+  line-height: 1.2;
 }
 
-.app-shell {
-  background: transparent;
+/* Global Classes */
+.btn-primary {
+  @apply px-4 py-2 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition;
 }
 
-.app-main {
-  background: var(--paper);
-  border-left: 1px solid var(--line);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.6);
-}
-
-.sidebar {
-  background: var(--ink);
-  color: var(--paper);
-}
-
-.sidebar-title {
-  font-family: 'DM Serif Display', serif;
-  letter-spacing: 0.4px;
-}
-
-.sidebar-item {
-  border-left: 3px solid transparent;
-  transition: background 0.2s ease, border-color 0.2s ease;
-}
-
-.sidebar-item:hover {
-  background: rgba(255, 255, 255, 0.08);
-}
-
-.sidebar-item.active {
-  border-left-color: var(--teal);
-  background: rgba(255, 255, 255, 0.12);
+.btn-secondary {
+  @apply px-4 py-2 bg-gray-200 text-gray-800 rounded-lg font-medium hover:bg-gray-300 transition;
 }
 
 .card {
-  background: var(--paper);
-  border: 1px solid var(--line);
-  border-radius: 20px;
-  box-shadow: var(--shadow);
+  @apply bg-white rounded-lg border border-gray-200 shadow-sm;
 }
 
-.stat-label {
-  color: var(--muted);
-  font-size: 0.8rem;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
+/* Navigation Pills */
+.nav-pill {
+  @apply px-4 py-2 rounded-full font-medium transition-all;
 }
 
-.stat-value {
-  color: var(--teal);
-  font-size: 2.2rem;
-  margin-top: 0.6rem;
-  font-family: 'DM Serif Display', serif;
+.nav-pill-active {
+  @apply bg-white text-blue-600 shadow-lg;
+}
+
+.nav-pill-inactive {
+  @apply bg-white/20 text-white hover:bg-white/30;
+}
+
+/* Scrollbar Styling */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+/* Focus Styles */
+input:focus,
+textarea:focus,
+select:focus {
+  outline: 2px solid var(--primary-color);
+  outline-offset: 0;
+}
+
+/* Table Styling */
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+thead th {
+  @apply bg-gray-50 text-left px-4 py-3 font-semibold text-gray-700 border-b border-gray-200;
+}
+
+tbody td {
+  @apply px-4 py-3 border-b border-gray-100;
+}
+
+tbody tr:hover {
+  @apply bg-gray-50;
+}
+
+/* Form Elements */
+input[type='text'],
+input[type='email'],
+input[type='password'],
+input[type='number'],
+select,
+textarea {
+  @apply w-full px-3 py-2 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-400;
+}
+
+input[type='text']:focus,
+input[type='email']:focus,
+input[type='password']:focus,
+input[type='number']:focus,
+select:focus,
+textarea:focus {
+  @apply border-blue-500 outline-none ring-1 ring-blue-500;
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes pulse-glow {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(37, 99, 235, 0.7);
+  }
+  50% {
+    box-shadow: 0 0 0 10px rgba(37, 99, 235, 0);
+  }
+}
+
+.fade-in {
+  animation: fadeIn 0.3s ease-in forwards;
+}
+
+.slide-in-left {
+  animation: slideInLeft 0.3s ease-out forwards;
+}
+
+.pulse-glow {
+  animation: pulse-glow 2s infinite;
+}
+
+/* Loading Spinner */
+.spinner {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Gradient Backgrounds */
+.gradient-blue {
+  background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+}
+
+.gradient-purple {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.gradient-success {
+  background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+}
+
+/* Shadow Effects */
+.shadow-elevated {
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+
+/* Hover Effects */
+.hover-lift:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.15);
+}
+
+/* Badge Styles */
+.badge {
+  @apply inline-flex items-center px-3 py-1 rounded-full text-sm font-medium;
+}
+
+.badge-primary {
+  @apply bg-blue-100 text-blue-800;
+}
+
+.badge-success {
+  @apply bg-green-100 text-green-800;
+}
+
+.badge-warning {
+  @apply bg-yellow-100 text-yellow-800;
+}
+
+.badge-danger {
+  @apply bg-red-100 text-red-800;
 }
