@@ -2,8 +2,8 @@ const supabase = require('../config/supabase');
 
 // Mock data
 const MOCK_STAFF_ROLE_MAP = [
-  { staff_role_map_id: 1, staff_id: 1, role_id: 1, staff_name: 'Dr. John Smith', role_name: 'Admin', is_active: true },
-  { staff_role_map_id: 2, staff_id: 2, role_id: 2, staff_name: 'Ms. Sarah Johnson', role_name: 'Teacher', is_active: true },
+  { staff_role_map_id: 1, staff_id: 1, role_id: 1, staff_name: 'Dr. John Smith', role_name: 'Admin' },
+  { staff_role_map_id: 2, staff_id: 2, role_id: 2, staff_name: 'Ms. Sarah Johnson', role_name: 'Teacher' },
 ];
 
 const getAllStaffRoleMap = async (req, res) => {
@@ -30,12 +30,11 @@ const getStaffRoleMapById = async (req, res) => {
 
 const createStaffRoleMap = async (req, res) => {
   try {
-    const { staff_id, role_id, is_active } = req.body;
+    const { staff_id, role_id } = req.body;
     const { data, error } = await supabase.from('staff_role_map').insert([
       {
         staff_id,
-        role_id,
-        is_active: is_active !== undefined ? is_active : true
+        role_id
       }
     ]).select();
     if (error) throw error;

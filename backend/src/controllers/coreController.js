@@ -171,7 +171,7 @@ const getSubjects = async (req, res) => {
     const { department_id, semester } = req.query;
     
     let query = supabase
-      .from('subjects')
+      .from('subjects_master')
       .select(`
         *,
         departments(name)

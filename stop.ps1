@@ -6,8 +6,8 @@ Write-Host ""
 # Stop Backend (Port 5000)
 $backendProcess = Get-NetTCPConnection -LocalPort 5000 -ErrorAction SilentlyContinue
 if ($backendProcess) {
-    $pid = $backendProcess.OwningProcess
-    Stop-Process -Id $pid -Force -ErrorAction SilentlyContinue
+    $procId = $backendProcess.OwningProcess
+    Stop-Process -Id $procId -Force -ErrorAction SilentlyContinue
     Write-Host "Backend stopped (Port 5000)" -ForegroundColor Green
 } else {
     Write-Host "Backend not running" -ForegroundColor Gray
@@ -17,8 +17,8 @@ if ($backendProcess) {
 for ($port = 3000; $port -le 3010; $port++) {
     $frontendProcess = Get-NetTCPConnection -LocalPort $port -ErrorAction SilentlyContinue
     if ($frontendProcess) {
-        $pid = $frontendProcess.OwningProcess
-        Stop-Process -Id $pid -Force -ErrorAction SilentlyContinue
+        $procId = $frontendProcess.OwningProcess
+        Stop-Process -Id $procId -Force -ErrorAction SilentlyContinue
         Write-Host "Frontend stopped (Port $port)" -ForegroundColor Green
     }
 }

@@ -23,10 +23,7 @@ const navigation: Navigation[] = [
   { name: 'Holidays', href: '/holidays', icon: '🎉', requiredRoles: ['Admin'] },
   { name: 'Roles', href: '/roles', icon: '👥', requiredRoles: ['Admin'] },
   { name: 'Departments', href: '/departments', icon: '🏢', requiredRoles: ['Admin', 'HOD'] },
-  { name: 'Staff Roles', href: '/staff-role-map', icon: '🎓', requiredRoles: ['Admin'] },
-  { name: 'Staff Depts', href: '/staff-dept-map', icon: '🧭', requiredRoles: ['Admin', 'HOD'] },
   { name: 'Student Roles', href: '/student-role-map', icon: '📋', requiredRoles: ['Admin'] },
-  { name: 'Teacher Subjects', href: '/teacher-subject-map', icon: '📖', requiredRoles: ['Admin', 'HOD'] },
   { name: 'Staff Availability', href: '/staff-availability', icon: '🗓️', requiredRoles: ['Admin', 'HOD'] },
 ];
 

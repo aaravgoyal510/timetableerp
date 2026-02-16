@@ -8,7 +8,6 @@ interface StaffRoleMapping {
   role_id: number;
   staff_name?: string;
   role_name?: string;
-  is_active: boolean;
 }
 
 interface Staff {
@@ -31,8 +30,7 @@ export const StaffRoleMap: React.FC = () => {
   const [success, setSuccess] = useState<string | null>(null);
   const [formData, setFormData] = useState({
     staff_id: '',
-    role_id: '',
-    is_active: true
+    role_id: ''
   });
 
   useEffect(() => {
@@ -67,7 +65,7 @@ export const StaffRoleMap: React.FC = () => {
     try {
       await api.post('/staff-role-map', formData);
       setSuccess('Role assigned to staff successfully!');
-      setFormData({ staff_id: '', role_id: '', is_active: true });
+      setFormData({ staff_id: '', role_id: '' });
       setShowForm(false);
       setTimeout(() => {
         fetchData();
@@ -164,7 +162,6 @@ export const StaffRoleMap: React.FC = () => {
             <tr>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Staff Name</th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Role</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Actions</th>
             </tr>
           </thead>
@@ -173,11 +170,6 @@ export const StaffRoleMap: React.FC = () => {
               <tr key={mapping.staff_role_map_id} className="hover:bg-gray-50">
                 <td className="px-6 py-4 text-sm text-gray-900">{mapping.staff_name}</td>
                 <td className="px-6 py-4 text-sm text-gray-900">{mapping.role_name}</td>
-                <td className="px-6 py-4 text-sm">
-                  <span className={`px-2 py-1 rounded text-white text-xs ${mapping.is_active ? 'bg-green-600' : 'bg-red-600'}`}>
-                    {mapping.is_active ? 'Active' : 'Inactive'}
-                  </span>
-                </td>
                 <td className="px-6 py-4 text-sm">
                   <button
                     onClick={() => handleDelete(mapping.staff_role_map_id)}

@@ -18,10 +18,7 @@ const RoomAllotment = lazy(() => import('./pages/RoomAllotment').then((m) => ({ 
 const Holidays = lazy(() => import('./pages/Holidays').then((m) => ({ default: m.Holidays })));
 const Roles = lazy(() => import('./pages/Roles').then((m) => ({ default: m.Roles })));
 const Departments = lazy(() => import('./pages/Departments').then((m) => ({ default: m.Departments })));
-const StaffRoleMap = lazy(() => import('./pages/StaffRoleMap').then((m) => ({ default: m.StaffRoleMap })));
-const StaffDeptMap = lazy(() => import('./pages/StaffDeptMap').then((m) => ({ default: m.StaffDeptMap })));
 const StudentRoleMap = lazy(() => import('./pages/StudentRoleMap').then((m) => ({ default: m.StudentRoleMap })));
-const TeacherSubjectMap = lazy(() => import('./pages/TeacherSubjectMap').then((m) => ({ default: m.TeacherSubjectMap })));
 const StaffAvailability = lazy(() => import('./pages/StaffAvailability').then((m) => ({ default: m.StaffAvailability })));
 const Login = lazy(() => import('./pages/Login').then((m) => ({ default: m.Login })));
 
@@ -53,10 +50,7 @@ function AppContent() {
         <Route path="/holidays" element={<ProtectedRoute><Layout><Holidays /></Layout></ProtectedRoute>} />
         <Route path="/roles" element={<ProtectedRoute><Layout><Roles /></Layout></ProtectedRoute>} />
         <Route path="/departments" element={<ProtectedRoute><Layout><Departments /></Layout></ProtectedRoute>} />
-        <Route path="/staff-role-map" element={<ProtectedRoute><Layout><StaffRoleMap /></Layout></ProtectedRoute>} />
-        <Route path="/staff-dept-map" element={<ProtectedRoute><Layout><StaffDeptMap /></Layout></ProtectedRoute>} />
         <Route path="/student-role-map" element={<ProtectedRoute><Layout><StudentRoleMap /></Layout></ProtectedRoute>} />
-        <Route path="/teacher-subject-map" element={<ProtectedRoute><Layout><TeacherSubjectMap /></Layout></ProtectedRoute>} />
         <Route path="/staff-availability" element={<ProtectedRoute><Layout><StaffAvailability /></Layout></ProtectedRoute>} />
 
         <Route path="*" element={<Navigate to="/login" replace />} />

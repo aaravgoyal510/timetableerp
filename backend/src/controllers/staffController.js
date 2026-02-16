@@ -1,4 +1,18 @@
 const supabase = require('../config/supabase');
+const bcrypt = require('bcryptjs');
+
+const generatePin = (length = 6) => {
+  let pin = '';
+  while (pin.length < length) {
+    pin += Math.floor(Math.random() * 10).toString();
+  }
+  return pin;
+};
+
+const hashPin = async (pin) => {
+  const salt = await bcrypt.genSalt(10);
+  return bcrypt.hash(pin, salt);
+};
 
 // Mock data for when Supabase is unavailable
 const MOCK_STAFF = [
@@ -31,7 +45,7 @@ const getStaffById = async (req, res) => {
 
 const createStaff = async (req, res) => {
   try {
-    const { staff_name, email, phone_number, department_id, designation, staff_type } = req.body;
+    const { staff_name, email, phone_number, department_id, designation, staff_type, role_id, subject_codes } = req.body;
     
     // Validation
     if (!staff_name || !staff_name.trim()) {
@@ -58,6 +72,9 @@ const createStaff = async (req, res) => {
     if (!department_id) {
       return res.status(422).json({ error: 'Department is required.' });
     }
+    if (!role_id) {
+      return res.status(422).json({ error: 'Role is required.' });
+    }
     
     const { data, error } = await supabase.from('staff').insert([
       {
@@ -71,7 +88,76 @@ const createStaff = async (req, res) => {
       }
     ]).select();
     if (error) throw error;
-    res.status(201).json(data[0]);
+    const createdStaff = data[0];
+
+    const pin = generatePin(6);
+    const pinHash = await hashPin(pin);
+
+    const { error: credError } = await supabase
+      .from('auth_credentials')
+      .insert({
+        staff_id: createdStaff.staff_id,
+        pin_hash: pinHash,
+        is_active: true
+      });
+    if (credError) {
+      await supabase.from('staff').delete().eq('staff_id', createdStaff.staff_id);
+      throw credError;
+    }
+
+    const { error: roleError } = await supabase
+      .from('staff_role_map')
+      .insert({
+        staff_id: createdStaff.staff_id,
+        role_id
+      });
+    if (roleError) {
+      await supabase.from('auth_credentials').delete().eq('staff_id', createdStaff.staff_id);
+      await supabase.from('staff').delete().eq('staff_id', createdStaff.staff_id);
+      throw roleError;
+    }
+
+    const { error: deptMapError } = await supabase
+      .from('staff_dept_map')
+      .insert({
+        staff_id: createdStaff.staff_id,
+        department_id
+      });
+    if (deptMapError) {
+      await supabase.from('staff_role_map').delete().eq('staff_id', createdStaff.staff_id);
+      await supabase.from('auth_credentials').delete().eq('staff_id', createdStaff.staff_id);
+      await supabase.from('staff').delete().eq('staff_id', createdStaff.staff_id);
+      throw deptMapError;
+    }
+
+    const subjectCodes = Array.isArray(subject_codes)
+      ? subject_codes.filter((code) => typeof code === 'string' && code.trim().length > 0)
+      : [];
+
+    if (subjectCodes.length > 0) {
+      const subjectRows = subjectCodes.map((code) => ({
+        staff_id: createdStaff.staff_id,
+        subject_code: code
+      }));
+      const { error: subjectError } = await supabase
+        .from('teacher_subject_map')
+        .insert(subjectRows);
+      if (subjectError) {
+        await supabase.from('teacher_subject_map').delete().eq('staff_id', createdStaff.staff_id);
+        await supabase.from('staff_dept_map').delete().eq('staff_id', createdStaff.staff_id);
+        await supabase.from('staff_role_map').delete().eq('staff_id', createdStaff.staff_id);
+        await supabase.from('auth_credentials').delete().eq('staff_id', createdStaff.staff_id);
+        await supabase.from('staff').delete().eq('staff_id', createdStaff.staff_id);
+        throw subjectError;
+      }
+    }
+
+    res.status(201).json({
+      ...createdStaff,
+      role_id,
+      pin,
+      subject_codes: subjectCodes
+    });
   } catch (error) {
     res.status(400).json({ error: error.message });
   }
@@ -80,10 +166,79 @@ const createStaff = async (req, res) => {
 const updateStaff = async (req, res) => {
   try {
     const { id } = req.params;
-    const updates = req.body;
-    const { data, error } = await supabase.from('staff').update(updates).eq('staff_id', id).select();
-    if (error) throw error;
-    res.status(200).json(data[0]);
+    const updates = { ...req.body };
+    const roleId = updates.role_id;
+    const subjectCodesRaw = updates.subject_codes;
+    delete updates.role_id;
+    delete updates.subject_codes;
+
+    let updatedStaff = null;
+    if (Object.keys(updates).length > 0) {
+      const { data, error } = await supabase
+        .from('staff')
+        .update(updates)
+        .eq('staff_id', id)
+        .select();
+      if (error) throw error;
+      updatedStaff = data[0];
+    }
+
+    if (roleId) {
+      const { error: clearRoleError } = await supabase
+        .from('staff_role_map')
+        .delete()
+        .eq('staff_id', id);
+      if (clearRoleError) throw clearRoleError;
+
+      const { error: insertRoleError } = await supabase
+        .from('staff_role_map')
+        .insert({
+          staff_id: Number(id),
+          role_id: roleId
+        });
+      if (insertRoleError) throw insertRoleError;
+    }
+
+    if (updates.department_id) {
+      const { error: clearDeptError } = await supabase
+        .from('staff_dept_map')
+        .delete()
+        .eq('staff_id', id);
+      if (clearDeptError) throw clearDeptError;
+
+      const { error: insertDeptError } = await supabase
+        .from('staff_dept_map')
+        .insert({
+          staff_id: Number(id),
+          department_id: updates.department_id
+        });
+      if (insertDeptError) throw insertDeptError;
+    }
+
+    if (Array.isArray(subjectCodesRaw)) {
+      const subjectCodes = subjectCodesRaw.filter(
+        (code) => typeof code === 'string' && code.trim().length > 0
+      );
+
+      const { error: clearSubjectsError } = await supabase
+        .from('teacher_subject_map')
+        .delete()
+        .eq('staff_id', id);
+      if (clearSubjectsError) throw clearSubjectsError;
+
+      if (subjectCodes.length > 0) {
+        const subjectRows = subjectCodes.map((code) => ({
+          staff_id: Number(id),
+          subject_code: code
+        }));
+        const { error: insertSubjectError } = await supabase
+          .from('teacher_subject_map')
+          .insert(subjectRows);
+        if (insertSubjectError) throw insertSubjectError;
+      }
+    }
+
+    res.status(200).json(updatedStaff || { staff_id: Number(id) });
   } catch (error) {
     res.status(400).json({ error: error.message });
   }

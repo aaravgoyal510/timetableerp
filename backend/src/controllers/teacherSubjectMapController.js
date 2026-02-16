@@ -2,8 +2,8 @@ const supabase = require('../config/supabase');
 
 // Mock data
 const MOCK_TEACHER_SUBJECT_MAP = [
-  { teacher_subject_map_id: 1, staff_id: 1, subject_id: 1, staff_name: 'Dr. John Smith', subject_name: 'Data Structures', subject_code: 'CS101', is_active: true },
-  { teacher_subject_map_id: 2, staff_id: 2, subject_id: 2, staff_name: 'Ms. Sarah Johnson', subject_name: 'Database Management', subject_code: 'CS102', is_active: true },
+  { staff_id: 1, subject_code: 'CS101', staff_name: 'Dr. John Smith', subject_name: 'Data Structures' },
+  { staff_id: 2, subject_code: 'CS102', staff_name: 'Ms. Sarah Johnson', subject_name: 'Database Management' },
 ];
 
 const getAllTeacherSubjectMap = async (req, res) => {
@@ -30,12 +30,11 @@ const getTeacherSubjectMapById = async (req, res) => {
 
 const createTeacherSubjectMap = async (req, res) => {
   try {
-    const { staff_id, subject_id, is_active } = req.body;
+    const { staff_id, subject_code } = req.body;
     const { data, error } = await supabase.from('teacher_subject_map').insert([
       {
         staff_id,
-        subject_id,
-        is_active: is_active !== undefined ? is_active : true
+        subject_code
       }
     ]).select();
     if (error) throw error;
