@@ -90,7 +90,7 @@ const getStaff = async (req, res) => {
       .from('staff')
       .select(`
         *,
-        staff_dept_map(department_id, departments(department_name)),
+        staff_dept_map(department_id, departments(name)),
         staff_role_map(role_id, roles_master(role_name))
       `);
     
@@ -110,7 +110,7 @@ const getStaffById = async (req, res) => {
       .from('staff')
       .select(`
         *,
-        staff_dept_map(department_id, departments(department_name)),
+        staff_dept_map(department_id, departments(name)),
         staff_role_map(role_id, roles_master(role_name))
       `)
       .eq('staff_id', id)
@@ -134,7 +134,7 @@ const getClasses = async (req, res) => {
       .from('classes')
       .select(`
         *,
-        departments(department_name, department_code),
+        departments(name),
         staff(staff_name)
       `);
     
@@ -174,7 +174,7 @@ const getSubjects = async (req, res) => {
       .from('subjects')
       .select(`
         *,
-        departments(department_name)
+        departments(name)
       `);
     
     if (department_id) query = query.eq('department_id', department_id);
