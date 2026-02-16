@@ -105,32 +105,11 @@ const modules: Module[] = [
     requiredRoles: ['Admin'],
   },
   {
-    name: 'Staff Roles',
-    href: '/staff-role-map',
-    icon: '🎓',
-    description: 'Assign Roles',
-    requiredRoles: ['Admin'],
-  },
-  {
-    name: 'Staff Depts',
-    href: '/staff-dept-map',
-    icon: '🧭',
-    description: 'Department Mapping',
-    requiredRoles: ['Admin', 'HOD'],
-  },
-  {
     name: 'Student Roles',
     href: '/student-role-map',
     icon: '📋',
     description: 'Student Roles',
     requiredRoles: ['Admin'],
-  },
-  {
-    name: 'Teacher Subjects',
-    href: '/teacher-subject-map',
-    icon: '📖',
-    description: 'Subject Mapping',
-    requiredRoles: ['Admin', 'HOD'],
   },
   {
     name: 'Staff Availability',
