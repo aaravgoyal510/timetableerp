@@ -31,7 +31,7 @@ interface Subject {
 }
 
 interface TeacherSubjectMapEntry {
-  staff_id: number;
+  staff_id: string;
   subject_code: string;
 }
 
@@ -42,8 +42,8 @@ export const Staff: React.FC = () => {
   const [roles, setRoles] = useState<Role[]>([]);
   const [departments, setDepartments] = useState<Department[]>([]);
   const [subjects, setSubjects] = useState<Subject[]>([]);
-  const [subjectAssignments, setSubjectAssignments] = useState<Record<number, string[]>>({});
-  const [editingStaffId, setEditingStaffId] = useState<number | null>(null);
+  const [subjectAssignments, setSubjectAssignments] = useState<Record<string, string[]>>({});
+  const [editingStaffId, setEditingStaffId] = useState<string | null>(null);
   const [editAssignments, setEditAssignments] = useState({
     role_id: '',
     department_id: '',
@@ -92,7 +92,7 @@ export const Staff: React.FC = () => {
       setDepartments(deptRes.data || []);
       setSubjects(subjectsRes.data || []);
 
-      const assignments: Record<number, string[]> = {};
+      const assignments: Record<string, string[]> = {};
       (teacherSubjectsRes.data || []).forEach((row: TeacherSubjectMapEntry) => {
         if (!row?.staff_id || !row?.subject_code) return;
         if (!assignments[row.staff_id]) {
@@ -164,7 +164,7 @@ export const Staff: React.FC = () => {
     }
   };
 
-  const handleDelete = async (id: number) => {
+  const handleDelete = async (id: string) => {
     if (window.confirm('Are you sure?')) {
       try {
         await staffAPI.delete(id);

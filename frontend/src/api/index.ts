@@ -150,10 +150,10 @@ export const dashboardAPI = {
 // ============================================
 export const studentsAPI = {
   getAll: (classId?: number) => api.get('/students', { params: { class_id: classId } }),
-  getById: (id: number) => api.get(`/students/${id}`),
+  getById: (id: string) => api.get(`/students/${id}`),
   create: (data: Record<string, unknown>) => api.post('/students', data),
-  update: (id: number, data: Record<string, unknown>) => api.put(`/students/${id}`, data),
-  delete: (id: number) => api.delete(`/students/${id}`),
+  update: (id: string, data: Record<string, unknown>) => api.put(`/students/${id}`, data),
+  delete: (id: string) => api.delete(`/students/${id}`),
 };
 
 // ============================================
@@ -161,10 +161,10 @@ export const studentsAPI = {
 // ============================================
 export const staffAPI = {
   getAll: (departmentId?: number) => api.get('/staff', { params: { department_id: departmentId } }),
-  getById: (id: number) => api.get(`/staff/${id}`),
+  getById: (id: string) => api.get(`/staff/${id}`),
   create: (data: Record<string, unknown>) => api.post('/staff', data),
-  update: (id: number, data: Record<string, unknown>) => api.put(`/staff/${id}`, data),
-  delete: (id: number) => api.delete(`/staff/${id}`),
+  update: (id: string, data: Record<string, unknown>) => api.put(`/staff/${id}`, data),
+  delete: (id: string) => api.delete(`/staff/${id}`),
 };
 
 // ============================================

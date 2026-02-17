@@ -147,7 +147,7 @@ export const Students: React.FC = () => {
     }
   };
 
-  const handleDelete = async (id: number) => {
+  const handleDelete = async (id: string) => {
     if (!window.confirm('Delete this student?')) return;
 
     try {
