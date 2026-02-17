@@ -2,10 +2,25 @@ const supabase = require('../config/supabase');
 
 // Mock data for when Supabase is unavailable
 const MOCK_STUDENTS = [
-  { student_id: 1, roll_number: 'CS001', student_name: 'Aarav Goyal', email: 'aarav@example.com', phone_number: '9876543210', admission_year: 2023, batch: 'A', is_active: true },
-  { student_id: 2, roll_number: 'CS002', student_name: 'Priya Sharma', email: 'priya@example.com', phone_number: '9876543211', admission_year: 2023, batch: 'B', is_active: true },
-  { student_id: 3, roll_number: 'CS003', student_name: 'Rajesh Kumar', email: 'rajesh@example.com', phone_number: '9876543212', admission_year: 2024, batch: 'A', is_active: true },
+  { student_id: '0231bca001', roll_number: 'CS001', student_name: 'Aarav Goyal', email: 'aarav@example.com', phone_number: '9876543210', admission_year: 2023, batch: 'A', is_active: true },
+  { student_id: '0231bca002', roll_number: 'CS002', student_name: 'Priya Sharma', email: 'priya@example.com', phone_number: '9876543211', admission_year: 2023, batch: 'B', is_active: true },
+  { student_id: '0241cs001', roll_number: 'CS003', student_name: 'Rajesh Kumar', email: 'rajesh@example.com', phone_number: '9876543212', admission_year: 2024, batch: 'A', is_active: true },
 ];
+
+// Helper function to extract course code from course_name (e.g., "BCA Computer Science" -> "BCA")
+const extractCourseCode = (courseName) => {
+  if (!courseName) return '';
+  const parts = courseName.split(' ');
+  return parts[0].toLowerCase(); // Get first word and lowercase
+};
+
+// Helper function to generate student_id: 0[YY]1[CourseCode][RollNumber]
+// Example: 0251bca116 (year=25, course=bca, roll=116)
+const generateStudentId = (yearOfJoining, courseCode, rollNumber) => {
+  const yy = String(yearOfJoining).slice(-2); // Last 2 digits of year
+  const code = courseCode.toLowerCase();
+  return `0${yy}1${code}${rollNumber}`;
+};
 
 const updateClassStudentCount = async (classId) => {
   if (!classId) return;
@@ -49,7 +64,7 @@ const getStudentById = async (req, res) => {
 // Create student
 const createStudent = async (req, res) => {
   try {
-    const { roll_number, student_name, email, phone_number, admission_year, batch, class_id } = req.body;
+    const { roll_number, student_name, email, phone_number, admission_year, batch, class_id, custom_student_id } = req.body;
     
     // Validation
     if (!roll_number || !roll_number.trim()) {
@@ -80,8 +95,33 @@ const createStudent = async (req, res) => {
       return res.status(422).json({ error: 'class_id is required for student enrollment.' });
     }
     
+    // Generate or use custom student_id
+    let student_id = custom_student_id;
+    if (!student_id || !student_id.trim()) {
+      // Auto-generate: 0[YY]1[CourseCode][RollNumber]
+      // First, fetch class to get course_name
+      const { data: classData, error: classError } = await supabase
+        .from('classes')
+        .select('course_name')
+        .eq('class_id', class_id)
+        .single();
+      if (classError || !classData) {
+        return res.status(400).json({ error: 'Invalid class_id provided.' });
+      }
+      
+      const courseCode = extractCourseCode(classData.course_name);
+      if (!courseCode) {
+        return res.status(400).json({ error: 'Unable to extract course code from class. Please provide a custom student_id.' });
+      }
+      
+      student_id = generateStudentId(admission_year, courseCode, roll_number);
+    } else {
+      student_id = student_id.trim().toUpperCase();
+    }
+    
     const { data, error } = await supabase.from('students').insert([
       {
+        student_id,
         roll_number: roll_number.trim().toUpperCase(),
         student_name: student_name.trim(),
         email: email.trim().toLowerCase(),
@@ -92,7 +132,13 @@ const createStudent = async (req, res) => {
         is_active: true
       }
     ]).select();
-    if (error) throw error;
+    if (error) {
+      // Improve error message for duplicate student_id
+      if (error.message.includes('duplicate key') || error.message.includes('unique')) {
+        return res.status(409).json({ error: 'Student ID already exists. Please provide a different custom student_id.' });
+      }
+      throw error;
+    }
     await updateClassStudentCount(class_id);
     res.status(201).json(data[0]);
   } catch (error) {

@@ -3,7 +3,7 @@ import type { AxiosError } from 'axios';
 import { staffAPI, roleAPI, departmentsAPI, subjectsAPI, teacherSubjectMapAPI } from '../api';
 
 interface Staff {
-  staff_id: number;
+  staff_id: string;
   staff_name: string;
   email: string;
   phone_number: string;
@@ -52,7 +52,10 @@ export const Staff: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
+  const currentYear = new Date().getFullYear();
   const [formData, setFormData] = useState({
+    custom_staff_id: '',
+    joining_year: currentYear.toString(),
     staff_name: '',
     email: '',
     phone_number: '',
@@ -62,6 +65,13 @@ export const Staff: React.FC = () => {
     role_id: '',
     subject_codes: [] as string[]
   });
+
+  // Helper to generate staff_id preview: 0[YY]1FT[Sequential]
+  const generateStaffIdPreview = () => {
+    if (!formData.joining_year) return '';
+    const yy = formData.joining_year.slice(-2);
+    return `0${yy}1ft###`; // ### represents auto-incremented sequence
+  };
 
   useEffect(() => {
     fetchStaff();
@@ -109,11 +119,16 @@ export const Staff: React.FC = () => {
     setSuccess(null);
 
     try {
-      const response = await staffAPI.create({
+      const payload: Record<string, unknown> = {
         ...formData,
         role_id: Number(formData.role_id),
+        joining_year: parseInt(formData.joining_year),
         subject_codes: formData.subject_codes
-      });
+      };
+      if (!formData.custom_staff_id) {
+        delete payload.custom_staff_id;
+      }
+      const response = await staffAPI.create(payload);
       console.log('Staff created:', response.data);
       if (response.data?.pin) {
         alert(`Temporary PIN for ${response.data.staff_name}: ${response.data.pin}`);
@@ -121,6 +136,8 @@ export const Staff: React.FC = () => {
       
       setSuccess('Staff member added successfully!');
       setFormData({
+        custom_staff_id: '',
+        joining_year: currentYear.toString(),
         staff_name: '',
         email: '',
         phone_number: '',
@@ -247,6 +264,42 @@ export const Staff: React.FC = () => {
             Add New Staff Member
           </h2>
           <form onSubmit={handleSubmit} className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Joining Year *</label>
+                <input
+                  type="number"
+                  min="2000"
+                  max="2100"
+                  value={formData.joining_year}
+                  onChange={(e) => setFormData({ ...formData, joining_year: e.target.value })}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900 transition"
+                  required
+                />
+                <p className="text-xs text-gray-500 mt-1">Year of joining (e.g., 2025)</p>
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Auto-Generated Staff ID</label>
+                <div className="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-50 text-gray-700 font-mono font-semibold">
+                  {generateStaffIdPreview() || '(Enter joining year)'}
+                </div>
+                <p className="text-xs text-gray-500 mt-1">Format: 0[YY]1FT[Sequential], e.g., 0251ft002</p>
+              </div>
+            </div>
+            
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Custom Staff ID (Optional)</label>
+              <input
+                type="text"
+                placeholder="Leave empty to use auto-generated ID"
+                value={formData.custom_staff_id}
+                onChange={(e) => setFormData({ ...formData, custom_staff_id: e.target.value.toLowerCase() })}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900 transition font-mono"
+              />
+              <p className="text-xs text-gray-500 mt-1">For bulk imports or legacy records</p>
+            </div>
+
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">Staff Name *</label>
               <input
@@ -462,6 +515,7 @@ export const Staff: React.FC = () => {
           <table className="w-full">
             <thead className="bg-gray-100">
               <tr>
+                <th className="px-6 py-3 text-left">Staff ID</th>
                 <th className="px-6 py-3 text-left">Name</th>
                 <th className="px-6 py-3 text-left">Email</th>
                 <th className="px-6 py-3 text-left">Designation</th>
@@ -475,6 +529,7 @@ export const Staff: React.FC = () => {
             <tbody>
               {staff.map((member) => (
                 <tr key={member.staff_id} className="border-t hover:bg-gray-50">
+                  <td className="px-6 py-4 font-mono font-semibold text-gray-900">{member.staff_id}</td>
                   <td className="px-6 py-4">{member.staff_name}</td>
                   <td className="px-6 py-4">{member.email}</td>
                   <td className="px-6 py-4">{member.designation}</td>

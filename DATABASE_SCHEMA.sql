@@ -27,27 +27,34 @@ CREATE TABLE IF NOT EXISTS public.roles_master (
 );
 
 -- Students Table
+-- student_id format: 0[YY]1[CourseCode][RollNumber]
+-- Example: 0251bca116 (year=25, course=bca, roll=116)
+-- Can be manually set during bulk import; otherwise auto-generated
 CREATE TABLE IF NOT EXISTS public.students (
-  student_id integer NOT NULL DEFAULT nextval('students_student_id_seq'::regclass),
+  student_id character varying NOT NULL PRIMARY KEY,
   roll_number character varying NOT NULL UNIQUE,
   student_name character varying NOT NULL,
   email character varying UNIQUE,
   phone_number numeric,
   admission_year integer NOT NULL,
   batch character varying,
+  class_id integer,
   is_active boolean DEFAULT true,
-  CONSTRAINT students_pkey PRIMARY KEY (student_id)
+  CONSTRAINT students_class_id_fkey FOREIGN KEY (class_id) REFERENCES public.classes(class_id)
 );
 
 -- Staff Table
+-- staff_id format: 0[YY]1FT[Sequential]
+-- Example: 0251ft001 (year=25, faculty fixed, seq=001)
+-- Can be manually set during bulk import; otherwise auto-generated
 CREATE TABLE IF NOT EXISTS public.staff (
-  staff_id integer NOT NULL DEFAULT nextval('staff_staff_id_seq'::regclass),
+  staff_id character varying NOT NULL PRIMARY KEY,
   staff_name character varying NOT NULL,
   email character varying UNIQUE,
   phone_number character varying,
   department_id integer,
   designation character varying,
-  staff_type character varying NOT NULL CHECK (staff_type::text = ANY (ARRAY['Permanent'::character varying, 'Visiting'::character varying]::text[])),
+  staff_type character varying NOT NULL CHECK (staff_type::text = ANY (ARRAY['Permanent'::character varying, 'Visiting'::character varying, 'Contract'::character varying]::text[])),
   is_active boolean DEFAULT true,
   CONSTRAINT staff_pkey PRIMARY KEY (staff_id)
 );

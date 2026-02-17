@@ -57,7 +57,6 @@ const createClass = async (req, res) => {
         section: section.trim().toUpperCase(),
         academic_year: academic_year.trim(),
         shift,
-        student_count: 0,
         is_active: true
       }
     ]).select();

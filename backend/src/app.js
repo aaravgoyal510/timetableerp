@@ -39,18 +39,22 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Health check
-app.get('/api/health', (req, res) => {
+// Request logging middleware
+app.use((req, res, next) => {
+  console.log(`[${new Date().toISOString()}] ${req.method} ${req.path}`);
+  next();
+});
+
+// API Routes - Mount specific routes BEFORE generic /api route
+app.use('/api/auth', authRoutes);
+app.use('/api/health', (req, res) => {
   res.status(200).json({
     status: 'API is running',
     environment: process.env.NODE_ENV || 'development',
     timestamp: new Date().toISOString()
   });
 });
-
-// API Routes
-app.use('/api/auth', authRoutes);
-app.use('/api', coreRoutes);
+// Mount specific routes BEFORE the /api route
 app.use('/api/students', studentRoutes);
 app.use('/api/staff', staffRoutes);
 app.use('/api/classes', classRoutes);
@@ -68,6 +72,8 @@ app.use('/api/teacher-subject-map', teacherSubjectMapRoutes);
 app.use('/api/departments', departmentRoutes);
 app.use('/api/staff-dept-map', staffDeptMapRoutes);
 app.use('/api/staff-availability', staffAvailabilityRoutes);
+// Mount generic /api route LAST
+app.use('/api', coreRoutes);
 
 // Error handling
 app.use((err, req, res, next) => {

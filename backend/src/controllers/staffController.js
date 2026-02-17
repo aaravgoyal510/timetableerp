@@ -16,10 +16,39 @@ const hashPin = async (pin) => {
 
 // Mock data for when Supabase is unavailable
 const MOCK_STAFF = [
-  { staff_id: 1, staff_name: 'Dr. John Smith', designation: 'Professor', email: 'john@example.com', phone_number: '9999999991', staff_type: 'Permanent', is_active: true },
-  { staff_id: 2, staff_name: 'Ms. Sarah Johnson', designation: 'Assistant Professor', email: 'sarah@example.com', phone_number: '9999999992', staff_type: 'Permanent', is_active: true },
-  { staff_id: 3, staff_name: 'Mr. Rajesh Patel', designation: 'Lecturer', email: 'rajesh@example.com', phone_number: '9999999993', staff_type: 'Contract', is_active: true },
+  { staff_id: '0251ft001', staff_name: 'Dr. John Smith', designation: 'Professor', email: 'john@example.com', phone_number: '9999999991', department_id: 1, staff_type: 'Permanent', is_active: true },
+  { staff_id: '0251ft002', staff_name: 'Ms. Sarah Johnson', designation: 'Assistant Professor', email: 'sarah@example.com', phone_number: '9999999992', department_id: 1, staff_type: 'Permanent', is_active: true },
+  { staff_id: '0251ft003', staff_name: 'Mr. Rajesh Patel', designation: 'Lecturer', email: 'rajesh@example.com', phone_number: '9999999993', department_id: 2, staff_type: 'Visiting', is_active: true },
 ];
+
+// Helper function to get next sequential staff ID
+// Format: 0[YY]1FT[Sequential]
+// Example: 0251ft001 (year=25, faculty, seq=001)
+const getNextSequentialStaffId = async (yearOfJoining) => {
+  const yy = String(yearOfJoining).slice(-2); // Last 2 digits of year
+  const prefix = `0${yy}1ft`;
+  
+  // Get all staff IDs with this prefix and extract sequential numbers
+  const { data, error } = await supabase
+    .from('staff')
+    .select('staff_id')
+    .ilike('staff_id', `${prefix}%`);
+  
+  if (error && error.code !== 'PGRST116') throw error; // Ignore "no rows" error
+  
+  if (!data || data.length === 0) {
+    return `${prefix}001`;
+  }
+  
+  // Extract sequential numbers and find max
+  const sequentials = data
+    .map(record => parseInt(record.staff_id.slice(-3))) // Last 3 digits
+    .filter(n => !isNaN(n))
+    .sort((a, b) => b - a);
+  
+  const nextSeq = (sequentials[0] || 0) + 1;
+  return `${prefix}${String(nextSeq).padStart(3, '0')}`;
+};
 
 const getAllStaff = async (req, res) => {
   try {
@@ -45,7 +74,7 @@ const getStaffById = async (req, res) => {
 
 const createStaff = async (req, res) => {
   try {
-    const { staff_name, email, phone_number, department_id, designation, staff_type, role_id, subject_codes } = req.body;
+    const { custom_staff_id, joining_year, staff_name, email, phone_number, department_id, designation, staff_type, role_id, subject_codes } = req.body;
     
     // Validation
     if (!staff_name || !staff_name.trim()) {
@@ -76,17 +105,30 @@ const createStaff = async (req, res) => {
       return res.status(422).json({ error: 'Role is required.' });
     }
     
-    const { data, error } = await supabase.from('staff').insert([
-      {
-        staff_name: staff_name.trim(),
-        email: email.trim().toLowerCase(),
-        phone_number: phone_number.toString(),
-        department_id,
-        designation: designation.trim(),
-        staff_type,
-        is_active: true
+    // Generate or use custom staff_id
+    let staff_id = custom_staff_id;
+    if (!staff_id || !staff_id.trim()) {
+      // Auto-generate: 0[YY]1FT[Sequential]
+      if (!joining_year) {
+        return res.status(422).json({ error: 'Joining year is required for staff ID auto-generation.' });
       }
-    ]).select();
+      staff_id = await getNextSequentialStaffId(joining_year);
+    } else {
+      staff_id = staff_id.trim().toLowerCase();
+    }
+    
+    const staffRecord = {
+      staff_id,
+      staff_name: staff_name.trim(),
+      email: email.trim().toLowerCase(),
+      phone_number: phone_number.toString(),
+      department_id,
+      designation: designation.trim(),
+      staff_type,
+      is_active: true
+    };
+    
+    const { data, error } = await supabase.from('staff').insert([staffRecord]).select();
     if (error) throw error;
     const createdStaff = data[0];
 
@@ -247,8 +289,43 @@ const updateStaff = async (req, res) => {
 const deleteStaff = async (req, res) => {
   try {
     const { id } = req.params;
-    const { error } = await supabase.from('staff').delete().eq('staff_id', id);
-    if (error) throw error;
+    
+    // Delete all related records first (cascade delete)
+    // 1. Delete teacher subject mappings
+    const { error: subjectError } = await supabase
+      .from('teacher_subject_map')
+      .delete()
+      .eq('staff_id', id);
+    if (subjectError) throw subjectError;
+    
+    // 2. Delete staff department mappings
+    const { error: deptMapError } = await supabase
+      .from('staff_dept_map')
+      .delete()
+      .eq('staff_id', id);
+    if (deptMapError) throw deptMapError;
+    
+    // 3. Delete staff role mappings
+    const { error: roleMapError } = await supabase
+      .from('staff_role_map')
+      .delete()
+      .eq('staff_id', id);
+    if (roleMapError) throw roleMapError;
+    
+    // 4. Delete auth credentials
+    const { error: authError } = await supabase
+      .from('auth_credentials')
+      .delete()
+      .eq('staff_id', id);
+    if (authError) throw authError;
+    
+    // 5. Finally delete the staff record
+    const { error: staffError } = await supabase
+      .from('staff')
+      .delete()
+      .eq('staff_id', id);
+    if (staffError) throw staffError;
+    
     res.status(200).json({ message: 'Staff deleted successfully' });
   } catch (error) {
     res.status(400).json({ error: error.message });

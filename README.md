@@ -1,29 +1,322 @@
 # 🎓 Timetable ERP System
 
-Comprehensive educational institution management system with timetable generation, attendance tracking, staff/student management, and role-based access control.
+Comprehensive educational institution management system with staff/student management, class assignments, timetable generation, attendance tracking, and role-based access control.
 
 **Built with:** Node.js + React + TypeScript + PostgreSQL (Supabase)  
-**Auth:** JWT with bcrypt PIN verification  
-**Deployment:** Full-stack monorepo, production-ready
+**Auth:** Staff ID + PIN (6-digit, bcrypt hashed)  
+**Architecture:** Full-stack npm workspaces monorepo  
+**Status:** Development-ready with auto-ID generation systems
 
 ---
 
-## 📋 Table of Contents
+## 📋 Quick Navigation
 
 - [Quick Start](#quick-start)
-- [Architecture](#architecture)
+- [ID Generation Systems](#id-generation-systems)
 - [Features](#features)
+- [Project Structure](#project-structure)
 - [Technology Stack](#technology-stack)
-- [Authentication](#authentication)
 - [API Endpoints](#api-endpoints)
-- [Testing](#testing)
 - [Troubleshooting](#troubleshooting)
-- [Security](#security)
-- [Future Enhancements](#future-enhancements)
 
 ---
 
 ## 🚀 Quick Start
+
+### Prerequisites
+- **Node.js 18+** (LTS)
+- **Supabase** account with PostgreSQL database
+- **Git** (for version control)
+
+### Installation
+
+```bash
+# Clone repository
+git clone https://github.com/yourusername/chaubey.git
+cd chaubey
+
+# Install all dependencies (backend + frontend)
+npm install
+```
+
+### Configuration
+
+**Backend** (`backend/.env`):
+```env
+SUPABASE_URL=your_supabase_url
+SUPABASE_KEY=your_supabase_key
+JWT_SECRET=your_jwt_secret_key
+PORT=5000
+```
+
+**Frontend** (`frontend/.env`):
+```env
+VITE_API_URL=http://localhost:5000/api
+```
+
+### Running
+
+```bash
+# Start both servers
+npm run dev
+```
+
+**Windows PowerShell:**
+```powershell
+.\start.ps1      # Start
+.\stop.ps1       # Stop
+```
+
+**Access:**
+- Frontend: http://localhost:3000
+- Backend API: http://localhost:5000/api
+
+---
+
+## 🆔 ID Generation Systems
+
+### Staff ID: `0[YY]1FT[Sequential]`
+
+**Format:**
+- `0` - Fixed prefix
+- `YY` - Year of joining (25 = 2025)
+- `1` - Fixed digit
+- `FT` - Fixed (Faculty/Teaching)
+- `[Sequential]` - Auto-incremented (001, 002, 003...)
+
+**Examples:**
+- `0251ft001` - Joined 2025, faculty, #001
+- `0251ft002` - Joined 2025, faculty, #002
+- `0261ft001` - Joined 2026, faculty, #001
+
+**PIN:** 6-digit numeric, bcrypt hashed, shown once after creation
+
+**Bulk Import:** Use `custom_staff_id` to override generation
+
+### Student ID: `0[YY]1[CourseCode][RollNumber]`
+
+**Format:**
+- `0` - Fixed prefix
+- `YY` - Year of joining (25 = 2025)
+- `1` - Fixed digit
+- `[CourseCode]` - From class name (bca, cs, it)
+- `[RollNumber]` - Sequential number
+
+**Examples:**
+- `0251bca116` - Joined 2025, BCA, roll #116
+- `0261cs001` - Joined 2026, CS, roll #001
+
+**Bulk Import:** Use `custom_student_id` to override generation
+
+See [STAFF_ID_SPECIFICATION.md](STAFF_ID_SPECIFICATION.md) and [STUDENT_ID_SPECIFICATION.md](STUDENT_ID_SPECIFICATION.md) for full details.
+
+---
+
+## ✨ Features
+
+### Staff Management
+- ✅ Auto-generated alphanumeric IDs (0[YY]1FT[Sequential])
+- ✅ Auto-generated 6-digit PIN verification
+- ✅ Bulk import with custom ID override
+- ✅ Role assignment (inline on Staff page)
+- ✅ Department assignment (inline on Staff page)
+- ✅ Subject assignment for teachers (inline on Staff page)
+- ✅ Cascading deletion with referential integrity
+
+### Student Management
+- ✅ Auto-generated course-based IDs (0[YY]1[CourseCode][RollNumber])
+- ✅ Class/batch assignment
+- ✅ Bulk import with custom ID override
+- ✅ Student enrollment tracking
+
+### Administrative
+- ✅ Class management (courses, semesters, sections)
+- ✅ Subject management with course mapping
+- ✅ Department management
+- ✅ Role-based access control (RBAC)
+- ✅ Timetable configuration
+- ✅ Room/timeslot management
+- ✅ Attendance tracking
+- ✅ Holiday calendar
+
+---
+
+## 📁 Project Structure
+
+```
+chaubey/
+├── backend/
+│   ├── src/
+│   │   ├── app.js                 # Express setup
+│   │   ├── controllers/           # Business logic
+│   │   │   ├── staffController.js
+│   │   │   ├── studentController.js
+│   │   │   └── ...
+│   │   ├── routes/                # API endpoints
+│   │   ├── middleware/            # Auth, logging
+│   │   └── config/
+│   ├── package.json
+│   └── .env
+│
+├── frontend/
+│   ├── src/
+│   │   ├── pages/                 # Route pages
+│   │   │   ├── Staff.tsx
+│   │   │   ├── Students.tsx
+│   │   │   └── ...
+│   │   ├── components/            # React components
+│   │   ├── api/                   # API clients
+│   │   ├── App.tsx
+│   │   └── main.tsx
+│   ├── package.json
+│   └── .env
+│
+├── package.json                   # Monorepo config
+├── README.md                      # This file
+├── QUICK_START.md                 # Development guide
+├── DATABASE_SCHEMA.sql            # Schema reference
+├── STAFF_ID_SPECIFICATION.md      # Staff ID docs
+├── STUDENT_ID_SPECIFICATION.md    # Student ID docs
+├── start.ps1                      # Windows launcher
+├── stop.ps1                       # Windows stopper
+└── .gitignore
+```
+
+---
+
+## 🛠 Technology Stack
+
+### Backend
+- **Runtime:** Node.js 18+
+- **Framework:** Express.js
+- **Database:** PostgreSQL (Supabase)
+- **Auth:** JWT + bcrypt
+- **Language:** JavaScript
+
+### Frontend
+- **Framework:** React 18+
+- **Language:** TypeScript
+- **Build:** Vite
+- **Styling:** Tailwind CSS
+- **HTTP:** Axios
+- **Icons:** Lucide React
+
+### Infrastructure
+- **Database:** Supabase (PostgreSQL)
+- **Package Manager:** npm workspaces
+- **Deployment:** Ready for Vercel, Netlify, Docker
+
+---
+
+## 🔌 API Endpoints
+
+### Staff
+```
+GET    /api/staff              # All staff
+GET    /api/staff/:id          # Single staff
+POST   /api/staff              # Create (auto/custom ID)
+PUT    /api/staff/:id          # Update
+DELETE /api/staff/:id          # Delete
+```
+
+### Students
+```
+GET    /api/students           # All students
+GET    /api/students/:id       # Single student
+POST   /api/students           # Create (auto/custom ID)
+PUT    /api/students/:id       # Update
+DELETE /api/students/:id       # Delete
+```
+
+### Classes
+```
+GET    /api/classes            # All classes
+POST   /api/classes            # Create
+PUT    /api/classes/:id        # Update
+DELETE /api/classes/:id        # Delete
+```
+
+### Subjects
+```
+GET    /api/subjects           # All subjects
+POST   /api/subjects           # Create
+DELETE /api/subjects/:code     # Delete
+```
+
+### More: Departments, Roles, Timeslots, Rooms, Attendance, etc.
+
+See `backend/src/routes/` for complete documentation.
+
+---
+
+## 🐛 Troubleshooting
+
+### Port Already in Use
+```powershell
+.\stop.ps1
+# or
+Get-Process -Name node | Stop-Process -Force
+```
+
+### Database Connection Issues
+1. Verify `SUPABASE_URL` and `SUPABASE_KEY` in `backend/.env`
+2. Check Supabase project is active
+3. Verify schema tables exist (see `DATABASE_SCHEMA.sql`)
+
+### Frontend Build Issues
+```bash
+cd frontend
+npm run build
+npm run preview
+```
+
+---
+
+## 📝 Development Workflow
+
+### Making Changes
+```bash
+# Create feature branch
+git checkout -b feature/your-feature
+
+# Make changes and test
+npm run dev
+
+# Commit
+git commit -am "Description"
+
+# Push
+git push origin feature/your-feature
+```
+
+### Validation
+```bash
+npm run validate    # ESLint + TypeScript + build
+npm run lint:fix    # Auto-fix linting
+```
+
+---
+
+## 🚀 Deployment
+
+### Build for Production
+```bash
+npm run build
+```
+
+### Environment for Production
+- Use strong JWT_SECRET
+- Use HTTPS for connections
+- Set NODE_ENV=production
+- Use process manager (PM2, systemd)
+
+---
+
+## 📄 License
+
+Educational ERP system - All rights reserved.
+
+**Last Updated:** February 17, 2026
 
 ### Prerequisites
 - **Node.js 18+** (LTS)

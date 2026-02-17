@@ -64,10 +64,33 @@ export const Departments: React.FC = () => {
     if (!window.confirm('Delete this department?')) return;
 
     try {
+      setError(null);
       await departmentsAPI.delete(id);
-      fetchDepartments();
-    } catch (error) {
+      setSuccess('Department deleted successfully!');
+      setTimeout(() => {
+        fetchDepartments();
+        setSuccess(null);
+      }, 1500);
+    } catch (error: unknown) {
       console.error('Error deleting department:', error);
+      const axiosError = error as AxiosError<Record<string, unknown>>;
+      const response = axiosError.response?.data as Record<string, unknown> | undefined;
+      
+      let errorMessage = 'Failed to delete department';
+      let detailsMessage = '';
+      
+      if (response?.error) {
+        errorMessage = typeof response.error === 'string' ? response.error : 'Failed to delete department';
+      }
+      
+      if (response?.details) {
+        const details = response.details as Record<string, unknown>;
+        if (details.message) {
+          detailsMessage = typeof details.message === 'string' ? details.message : '';
+        }
+      }
+      
+      setError(detailsMessage || errorMessage);
     }
   };
 
@@ -77,7 +100,7 @@ export const Departments: React.FC = () => {
       {error && (
         <div className="bg-red-50 border border-red-200 rounded-lg p-4">
           <p className="text-red-800 font-semibold">Error</p>
-          <p className="text-red-700 text-sm mt-1">{error}</p>
+          <p className="text-red-700 text-sm mt-1 whitespace-pre-wrap">{error}</p>
           <button onClick={() => setError(null)} className="text-red-700 text-xs mt-2 hover:text-red-900 underline">Dismiss</button>
         </div>
       )}
