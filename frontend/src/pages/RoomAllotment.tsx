@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { roomAllotmentAPI, roomsAPI as roomAPI, classesAPI as classAPI, staffAPI, subjectsAPI as subjectAPI, timeslotAPI } from '../api';
 import type { Room, Class, Staff, Subject, Timeslot } from '../types';
-import { MapPin, Plus } from 'lucide-react';
 
 interface RoomAllotment {
   booking_id?: number;
@@ -121,17 +120,14 @@ export const RoomAllotment: React.FC = () => {
       <div className="bg-white rounded-xl shadow-sm p-6">
         <div className="flex justify-between items-center">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900"><MapPin className="inline mr-2" size={32} />Room Allotment</h1>
+            <h1 className="text-3xl font-bold text-gray-900">📍 Room Allotment</h1>
             <p className="text-gray-600 mt-1">Allocate rooms for classes and activities</p>
           </div>
           <button
             onClick={() => setShowForm(!showForm)}
-            className="bg-gradient-to-r from-purple-600 to-purple-500 hover:from-purple-700 hover:to-purple-600 text-white px-6 py-3 rounded-lg font-medium transition shadow-md flex items-center gap-2"
+            className="bg-gradient-to-r from-purple-600 to-purple-500 hover:from-purple-700 hover:to-purple-600 text-white px-6 py-3 rounded-lg font-medium transition shadow-md"
           >
-            {showForm ? 'Cancel' : <>
-              <Plus size={20} />
-              New Allotment
-            </>}
+            {showForm ? 'Cancel' : '➕ New Allotment'}
           </button>
         </div>
       </div>
@@ -139,7 +135,7 @@ export const RoomAllotment: React.FC = () => {
       {showForm && (
         <div className="bg-white rounded-xl shadow-sm p-6">
           <h2 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
-            <Plus size={20} />
+            <span>➕</span>
             Create Room Allotment
           </h2>
           <form onSubmit={handleSubmit} className="space-y-4">

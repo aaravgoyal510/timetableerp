@@ -3,7 +3,7 @@ import { studentsAPI, classesAPI } from '../api';
 import { Plus, Trash2, GraduationCap, Mail, Phone, Calendar, AlertCircle } from 'lucide-react';
 
 interface Student {
-  student_id: number;
+  student_id: string;
   roll_number: string;
   student_name: string;
   email: string;
@@ -120,11 +120,11 @@ export const Students: React.FC = () => {
     }
   };
 
-  const handleDelete = async (id: number) => {
+  const handleDelete = async (id: string) => {
     if (!window.confirm('Delete this student?')) return;
 
     try {
-      await studentsAPI.delete(String(id));
+      await studentsAPI.delete(id);
       fetchData();
     } catch (error) {
       console.error('Error deleting student:', error);
