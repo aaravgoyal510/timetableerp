@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { timetableAPI, classesAPI, subjectsAPI, staffAPI, roomsAPI, timeslotAPI } from '../api';
 import type { Class, Subject, Staff, Room, Timeslot } from '../types';
+import { Calendar, Plus } from 'lucide-react';
 
 interface Timetable {
   timetable_id?: number;
@@ -97,14 +98,17 @@ export const Timetable: React.FC = () => {
       <div className="bg-white rounded-xl shadow-sm p-6">
         <div className="flex justify-between items-center">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900">📅 Timetable</h1>
+            <h1 className="text-3xl font-bold text-gray-900"><Calendar className="inline mr-2" size={32} />Timetable</h1>
             <p className="text-gray-600 mt-1">Manage class schedules and timetable entries</p>
           </div>
           <button
             onClick={() => setShowForm(!showForm)}
-            className="bg-gradient-to-r from-purple-600 to-purple-500 hover:from-purple-700 hover:to-purple-600 text-white px-6 py-3 rounded-lg font-medium transition shadow-md"
+            className="bg-gradient-to-r from-purple-600 to-purple-500 hover:from-purple-700 hover:to-purple-600 text-white px-6 py-3 rounded-lg font-medium transition shadow-md flex items-center gap-2"
           >
-            {showForm ? 'Cancel' : '➕ Add Entry'}
+            {showForm ? 'Cancel' : <>
+              <Plus size={20} />
+              Add Entry
+            </>}
           </button>
         </div>
       </div>
@@ -112,7 +116,7 @@ export const Timetable: React.FC = () => {
       {showForm && (
         <div className="bg-white rounded-xl shadow-sm p-6">
           <h2 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
-            <span>➕</span>
+            <Plus size={20} />
             Add Timetable Entry
           </h2>
           <form onSubmit={handleSubmit} className="space-y-4">

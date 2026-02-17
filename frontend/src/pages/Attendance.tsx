@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import type { AxiosError } from 'axios';
 import { attendanceAPI, studentsAPI as studentAPI, classesAPI as classAPI, subjectsAPI as subjectAPI, staffAPI, timeslotAPI } from '../api';
 import type { Student, Class, Subject, Staff, Timeslot } from '../types';
+import { CheckCircle, Plus } from 'lucide-react';
 
 interface Attendance {
   attendance_id?: number;
@@ -85,11 +85,10 @@ export const Attendance: React.FC = () => {
         fetchAllData();
         setSuccess(null);
       }, 1500);
-    } catch (error: unknown) {
+    } catch (error: any) {
       console.error('Error creating attendance:', error);
-      const axiosError = error as AxiosError<Record<string, unknown>>;
-      const errorMessage = axiosError.response?.data?.error || (error instanceof Error ? error.message : 'Failed to mark attendance');
-      setError(typeof errorMessage === 'string' ? errorMessage : 'Failed to mark attendance');
+      const errorMessage = error.response?.data?.error || error.message || 'Failed to mark attendance';
+      setError(errorMessage);
     }
   };
 
@@ -125,14 +124,17 @@ export const Attendance: React.FC = () => {
       <div className="bg-white rounded-xl shadow-sm p-6">
         <div className="flex justify-between items-center">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900">✅ Attendance</h1>
+            <h1 className="text-3xl font-bold text-gray-900"><CheckCircle className="inline mr-2" size={32} />Attendance</h1>
             <p className="text-gray-600 mt-1">Track and manage student attendance</p>
           </div>
           <button
             onClick={() => setShowForm(!showForm)}
-            className="bg-gradient-to-r from-purple-600 to-purple-500 hover:from-purple-700 hover:to-purple-600 text-white px-6 py-3 rounded-lg font-medium transition shadow-md"
+            className="bg-gradient-to-r from-purple-600 to-purple-500 hover:from-purple-700 hover:to-purple-600 text-white px-6 py-3 rounded-lg font-medium transition shadow-md flex items-center gap-2"
           >
-            {showForm ? 'Cancel' : '➕ Mark Attendance'}
+            {showForm ? 'Cancel' : <>
+              <Plus size={20} />
+              Mark Attendance
+            </>}
           </button>
         </div>
       </div>
@@ -140,7 +142,7 @@ export const Attendance: React.FC = () => {
       {showForm && (
         <div className="bg-white rounded-xl shadow-sm p-6">
           <h2 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
-            <span>➕</span>
+            <Plus size={20} />
             Mark New Attendance
           </h2>
           <form onSubmit={handleSubmit} className="space-y-4">

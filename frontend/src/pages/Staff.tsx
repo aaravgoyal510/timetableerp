@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import type { AxiosError } from 'axios';
 import { staffAPI, roleAPI, departmentsAPI, subjectsAPI, teacherSubjectMapAPI } from '../api';
+import { Plus } from 'lucide-react';
 
 interface Staff {
   staff_id: string;
@@ -250,9 +251,12 @@ export const Staff: React.FC = () => {
           </div>
           <button
             onClick={() => setShowForm(!showForm)}
-            className="bg-gray-900 hover:bg-gray-800 text-white px-6 py-3 rounded-lg font-medium transition shadow-sm"
+            className="bg-gray-900 hover:bg-gray-800 text-white px-6 py-3 rounded-lg font-medium transition shadow-sm flex items-center gap-2"
           >
-            {showForm ? 'Cancel' : '➕ Add Staff'}
+            {showForm ? 'Cancel' : <>
+              <Plus size={20} />
+              Add Staff
+            </>}
           </button>
         </div>
       </div>
@@ -260,7 +264,7 @@ export const Staff: React.FC = () => {
       {showForm && (
         <div className="bg-white rounded-lg border border-gray-200 p-6 shadow-sm">
           <h2 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
-            <span>➕</span>
+            <Plus size={20} />
             Add New Staff Member
           </h2>
           <form onSubmit={handleSubmit} className="space-y-4">

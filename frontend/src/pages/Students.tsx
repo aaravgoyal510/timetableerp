@@ -1,10 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import type { AxiosError } from 'axios';
 import { studentsAPI, classesAPI } from '../api';
-import { Plus, Trash2, GraduationCap } from 'lucide-react';
+import { Plus, Trash2, GraduationCap, Mail, Phone, Calendar, AlertCircle } from 'lucide-react';
 
 interface Student {
-  student_id: string;
+  student_id: number;
   roll_number: string;
   student_name: string;
   email: string;
@@ -40,28 +39,8 @@ export const Students: React.FC = () => {
     phone_number: '',
     admission_year: currentYear.toString(),
     batch: `${currentYear}-${currentYear + 4}`,
-    class_id: '',
-    custom_student_id: ''
+    class_id: ''
   });
-
-  // Helper to extract course code from course_name
-  const extractCourseCode = (courseName: string) => {
-    if (!courseName) return '';
-    const parts = courseName.split(' ');
-    return parts[0].toLowerCase();
-  };
-
-  // Helper to generate student_id: 0[YY]1[CourseCode][RollNumber]
-  const generateStudentId = () => {
-    if (!formData.class_id || !formData.admission_year || !formData.roll_number) return '';
-    const cls = classes.find(c => c.class_id === parseInt(formData.class_id));
-    if (!cls) return '';
-    const courseCode = extractCourseCode(cls.course_name);
-    const yy = formData.admission_year.slice(-2);
-    return `0${yy}1${courseCode}${formData.roll_number}`.toLowerCase();
-  };
-
-  const previewStudentId = generateStudentId();
 
   useEffect(() => {
     fetchData();
@@ -111,15 +90,11 @@ export const Students: React.FC = () => {
 
     try {
       setSubmitting(true);
-      const payload: Record<string, unknown> = {
+      await studentsAPI.create({
         ...formData,
         class_id: parseInt(formData.class_id),
         admission_year: parseInt(formData.admission_year)
-      };
-      if (!formData.custom_student_id) {
-        delete payload.custom_student_id;
-      }
-      await studentsAPI.create(payload);
+      });
       
       setSuccess('Student added successfully!');
       setFormData({
@@ -129,29 +104,27 @@ export const Students: React.FC = () => {
         phone_number: '',
         admission_year: formData.admission_year,
         batch: formData.batch,
-        class_id: formData.class_id,
-        custom_student_id: ''
+        class_id: formData.class_id
       });
       
       setTimeout(() => {
         fetchData();
         setSuccess(null);
       }, 1500);
-    } catch (error: unknown) {
+    } catch (error: any) {
       console.error('Error creating student:', error);
-      const axiosError = error as AxiosError<Record<string, unknown>>;
-      const errorMessage = axiosError.response?.data?.error || (error instanceof Error ? error.message : 'Failed to create student');
-      setError(typeof errorMessage === 'string' ? errorMessage : 'Failed to create student');
+      const errorMessage = error.response?.data?.error || error.message || 'Failed to create student';
+      setError(errorMessage);
     } finally {
       setSubmitting(false);
     }
   };
 
-  const handleDelete = async (id: string) => {
+  const handleDelete = async (id: number) => {
     if (!window.confirm('Delete this student?')) return;
 
     try {
-      await studentsAPI.delete(id);
+      await studentsAPI.delete(String(id));
       fetchData();
     } catch (error) {
       console.error('Error deleting student:', error);
@@ -190,29 +163,28 @@ export const Students: React.FC = () => {
       
       {/* Header */}
       <div className="bg-white rounded-xl shadow-sm p-6">
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">👨‍🎓 Students</h1>
+        <h1 className="text-3xl font-bold text-gray-900 mb-2"><GraduationCap className="inline mr-2" size={32} />Students</h1>
         <p className="text-gray-600">Manage student records and enrollments</p>
       </div>
 
       {/* Add Form */}
       <div className="bg-white rounded-xl shadow-sm p-6">
         <h2 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
-          <span>➕</span>
+          <Plus size={20} />
           Add New Student
         </h2>
         <form onSubmit={handleSubmit} className="space-y-4">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm text-gray-600 mb-1">Roll Number <span className="text-red-500">*</span></label>
+            <label className="block text-sm text-gray-600 mb-1">Roll Number</label>
             <input
               type="text"
-              placeholder="e.g., 116"
+              placeholder="e.g., 2024CSE001"
               value={formData.roll_number}
-              onChange={(e) => setFormData({ ...formData, roll_number: e.target.value })}
+              onChange={(e) => setFormData({ ...formData, roll_number: e.target.value.toUpperCase() })}
               className="w-full px-4 py-2 border-2 border-gray-200 rounded-lg focus:outline-none focus:border-purple-500 transition"
               required
             />
-            <p className="text-xs text-gray-500 mt-1">Numeric identifier for the student within the year and course</p>
           </div>
 
           <div>
@@ -279,7 +251,7 @@ export const Students: React.FC = () => {
           </div>
 
           <div>
-            <label className="block text-sm text-gray-600 mb-1">Class <span className="text-red-500">*</span></label>
+            <label className="block text-sm text-gray-600 mb-1">Class</label>
             <select
               value={formData.class_id}
               onChange={(e) => setFormData({ ...formData, class_id: e.target.value })}
@@ -293,28 +265,6 @@ export const Students: React.FC = () => {
                 </option>
               ))}
             </select>
-          </div>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <label className="block text-sm text-gray-600 mb-1">Auto-Generated Student ID</label>
-            <div className="w-full px-4 py-2 border-2 border-gray-200 rounded-lg bg-gray-50 text-gray-700 font-mono font-semibold">
-              {previewStudentId || '(Select class, year, and enter roll number)'}
-            </div>
-            <p className="text-xs text-gray-500 mt-1">Format: 0[YY]1[CourseCode][RollNumber], e.g., 0251bca116</p>
-          </div>
-          
-          <div>
-            <label className="block text-sm text-gray-600 mb-1">Custom Student ID (Optional)</label>
-            <input
-              type="text"
-              placeholder="Leave empty to use auto-generated ID"
-              value={formData.custom_student_id}
-              onChange={(e) => setFormData({ ...formData, custom_student_id: e.target.value.toUpperCase() })}
-              className="w-full px-4 py-2 border-2 border-gray-200 rounded-lg focus:outline-none focus:border-purple-500 transition font-mono"
-            />
-            <p className="text-xs text-gray-500 mt-1">For bulk imports or legacy records</p>
           </div>
         </div>
 
@@ -335,7 +285,7 @@ export const Students: React.FC = () => {
         <h2 className="text-lg font-bold text-gray-900 mb-4">All Students ({students.length})</h2>
         {students.length === 0 ? (
           <div className="text-center py-8">
-            <div className="text-6xl mb-4">💭</div>
+            <AlertCircle size={48} className="mx-auto text-gray-400 mb-4" />
             <p className="text-gray-500">No students yet</p>
           </div>
         ) : (
@@ -350,20 +300,20 @@ export const Students: React.FC = () => {
                   
                   <div className="flex-1">
                     <div className="flex items-center gap-3 mb-2">
-                      <span className="bg-gray-900 text-white px-3 py-1 rounded-md text-sm font-mono font-bold">
-                        {student.student_id}
-                      </span>
                       <h3 className="text-lg font-semibold text-gray-900">{student.student_name}</h3>
+                      <span className="bg-purple-100 text-purple-700 px-3 py-1 rounded-md text-sm font-mono">
+                        {student.roll_number}
+                      </span>
                       {student.is_active && (
                         <span className="text-green-600 text-sm">● Active</span>
                       )}
                     </div>
                     
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-1 text-sm text-gray-600">
-                      <div>📧 {student.email}</div>
-                      <div>📱 {student.phone_number}</div>
-                      <div>🎓 {getClassInfo(student.class_id)}</div>
-                      <div>📅 Batch {student.batch} | Roll# {student.roll_number}</div>
+                      <div className="flex items-center gap-2"><Mail size={16} /> {student.email}</div>
+                      <div className="flex items-center gap-2"><Phone size={16} /> {student.phone_number}</div>
+                      <div className="flex items-center gap-2"><GraduationCap size={16} /> {getClassInfo(student.class_id)}</div>
+                      <div className="flex items-center gap-2"><Calendar size={16} /> Batch {student.batch}</div>
                     </div>
                   </div>
                 </div>

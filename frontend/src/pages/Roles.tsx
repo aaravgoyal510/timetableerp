@@ -1,4 +1,7 @@
-import React, { useEffect, useState } from 'react';import type { AxiosError } from 'axios';import { roleAPI } from '../api';
+import React, { useEffect, useState } from 'react';
+import type { AxiosError } from 'axios';
+import { roleAPI } from '../api';
+import { Shield, Plus } from 'lucide-react';
 
 interface Role {
   role_id: number;
@@ -91,14 +94,17 @@ export const Roles: React.FC = () => {
       <div className="bg-white rounded-xl shadow-sm p-6">
         <div className="flex justify-between items-center">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900">🛡️ User Roles</h1>
+            <h1 className="text-3xl font-bold text-gray-900"><Shield className="inline mr-2" size={32} />User Roles</h1>
             <p className="text-gray-600 mt-1">Manage user roles and permissions</p>
           </div>
           <button
             onClick={() => setShowForm(!showForm)}
-            className="bg-gradient-to-r from-purple-600 to-purple-500 hover:from-purple-700 hover:to-purple-600 text-white px-6 py-3 rounded-lg font-medium transition shadow-md"
+            className="bg-gradient-to-r from-purple-600 to-purple-500 hover:from-purple-700 hover:to-purple-600 text-white px-6 py-3 rounded-lg font-medium transition shadow-md flex items-center gap-2"
           >
-            {showForm ? 'Cancel' : '➕ Add Role'}
+            {showForm ? 'Cancel' : <>
+              <Plus size={20} />
+              Add Role
+            </>}
           </button>
         </div>
       </div>

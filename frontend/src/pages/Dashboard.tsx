@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { dashboardAPI } from '../api';
 import { Link } from 'react-router-dom';
-
+import { Users, BookOpen, School, Book, Building, DoorOpen, BarChart3, CheckCircle, Calendar, Key, Target } from 'lucide-react';
 interface DashboardStats {
   totalStudents: number;
   totalClasses: number;
@@ -15,7 +15,7 @@ interface StatCard {
   label: string;
   value: number;
   description: string;
-  icon: string;
+  icon: React.ReactNode;
   href: string;
 }
 
@@ -50,42 +50,42 @@ export const Dashboard: React.FC = () => {
       label: 'Total Students',
       value: stats.totalStudents,
       description: 'Active enrollments',
-      icon: '👨‍🎓',
+      icon: <Users size={40} className="text-blue-600" />,
       href: '/students',
     },
     {
       label: 'Total Staff',
       value: stats.totalStaff,
       description: 'Faculty & staff',
-      icon: '👨‍🏫',
+      icon: <BookOpen size={40} className="text-green-600" />,
       href: '/staff',
     },
     {
       label: 'Active Classes',
       value: stats.totalClasses,
       description: 'Running classes',
-      icon: '🏫',
+      icon: <School size={40} className="text-purple-600" />,
       href: '/classes',
     },
     {
       label: 'Total Subjects',
       value: stats.totalSubjects,
       description: 'Course catalog',
-      icon: '📚',
+      icon: <Book size={40} className="text-orange-600" />,
       href: '/subjects',
     },
     {
       label: 'Departments',
       value: stats.totalDepartments,
       description: 'Organization',
-      icon: '🏢',
+      icon: <Building size={40} className="text-red-600" />,
       href: '/departments',
     },
     {
       label: 'Available Rooms',
       value: stats.totalRooms,
       description: 'Classroom spaces',
-      icon: '🚪',
+      icon: <DoorOpen size={40} className="text-indigo-600" />,
       href: '/rooms',
     },
   ];
@@ -112,7 +112,7 @@ export const Dashboard: React.FC = () => {
               You have {stats.totalStudents} students, {stats.totalStaff} staff members, and {stats.totalClasses} active classes
             </p>
           </div>
-          <div className="text-6xl">📊</div>
+          <BarChart3 size={64} className="text-purple-600" />
         </div>
       </div>
 
@@ -124,7 +124,7 @@ export const Dashboard: React.FC = () => {
             <Link key={card.href} to={card.href}>
               <div className="bg-white rounded-lg border border-gray-200 p-6 hover:shadow-lg hover:border-gray-300 transition cursor-pointer">
                 <div className="flex items-start justify-between mb-4">
-                  <div className="text-4xl">{card.icon}</div>
+                  <div>{card.icon}</div>
                   <div className="text-right">
                     <p className="text-4xl font-bold text-gray-900">{card.value}</p>
                   </div>
@@ -144,25 +144,25 @@ export const Dashboard: React.FC = () => {
         <h3 className="text-xl font-bold text-gray-900 mb-4">Quick Access</h3>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           <Link to="/attendance" className="bg-white rounded-lg border border-gray-200 p-6 hover:shadow-lg hover:border-gray-300 transition">
-            <div className="text-3xl mb-3">✓</div>
+            <CheckCircle size={32} className="mb-3 text-green-600" />
             <h4 className="font-bold text-gray-900 mb-1">Mark Attendance</h4>
             <p className="text-sm text-gray-600">Track daily attendance</p>
           </Link>
 
           <Link to="/timetable" className="bg-white rounded-lg border border-gray-200 p-6 hover:shadow-lg hover:border-gray-300 transition">
-            <div className="text-3xl mb-3">📅</div>
+            <Calendar size={32} className="mb-3 text-blue-600" />
             <h4 className="font-bold text-gray-900 mb-1">View Timetable</h4>
             <p className="text-sm text-gray-600">Check schedule</p>
           </Link>
 
           <Link to="/room-allotment" className="bg-white rounded-lg border border-gray-200 p-6 hover:shadow-lg hover:border-gray-300 transition">
-            <div className="text-3xl mb-3">🔑</div>
+            <Key size={32} className="mb-3 text-red-600" />
             <h4 className="font-bold text-gray-900 mb-1">Room Allocation</h4>
             <p className="text-sm text-gray-600">Manage room assignments</p>
           </Link>
 
           <Link to="/holidays" className="bg-white rounded-lg border border-gray-200 p-6 hover:shadow-lg hover:border-gray-300 transition">
-            <div className="text-3xl mb-3">🎉</div>
+            <Target size={32} className="mb-3 text-orange-600" />
             <h4 className="font-bold text-gray-900 mb-1">Holidays</h4>
             <p className="text-sm text-gray-600">View holidays</p>
           </Link>
@@ -173,7 +173,7 @@ export const Dashboard: React.FC = () => {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div className="bg-white rounded-lg border border-gray-200 p-6 shadow-sm">
           <div className="flex items-center gap-3 mb-4">
-            <div className="text-3xl">⚙️</div>
+            <BarChart3 size={24} className="text-gray-700" />
             <h3 className="text-lg font-bold text-gray-900">System Status</h3>
           </div>
           <div className="bg-green-50 border border-green-200 rounded-lg p-4">

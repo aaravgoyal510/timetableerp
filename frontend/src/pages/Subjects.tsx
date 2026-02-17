@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import type { AxiosError } from 'axios';
 import { subjectsAPI, departmentsAPI } from '../api';
 import { Plus, Trash2 } from 'lucide-react';
 
@@ -98,11 +97,10 @@ export const Subjects: React.FC = () => {
         fetchData();
         setSuccess(null);
       }, 1500);
-    } catch (error: unknown) {
+    } catch (error: any) {
       console.error('Error creating subject:', error);
-      const axiosError = error as AxiosError<Record<string, unknown>>;
-      const errorMessage = axiosError.response?.data?.error || (error instanceof Error ? error.message : 'Failed to create subject');
-      setError(typeof errorMessage === 'string' ? errorMessage : 'Failed to create subject');
+      const errorMessage = error.response?.data?.error || error.message || 'Failed to create subject';
+      setError(errorMessage);
     } finally {
       setSubmitting(false);
     }

@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import type { AxiosError } from 'axios';
 import { timeslotAPI } from '../api';
+import { Plus } from 'lucide-react';
 
 interface Timeslot {
   timeslot_id: number;
@@ -111,9 +112,12 @@ export const Timeslots: React.FC = () => {
           </div>
           <button
             onClick={() => setShowForm(!showForm)}
-            className="bg-gradient-to-r from-purple-600 to-purple-500 hover:from-purple-700 hover:to-purple-600 text-white px-6 py-3 rounded-lg font-medium transition shadow-md"
+            className="bg-gradient-to-r from-purple-600 to-purple-500 hover:from-purple-700 hover:to-purple-600 text-white px-6 py-3 rounded-lg font-medium transition shadow-md flex items-center gap-2"
           >
-            {showForm ? 'Cancel' : '➕ Add Timeslot'}
+            {showForm ? 'Cancel' : <>
+              <Plus size={20} />
+              Add Timeslot
+            </>}
           </button>
         </div>
       </div>
@@ -121,7 +125,7 @@ export const Timeslots: React.FC = () => {
       {showForm && (
         <div className="bg-white rounded-xl shadow-sm p-6">
           <h2 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
-            <span>➕</span>
+            <Plus size={20} />
             Add New Timeslot
           </h2>
           <form onSubmit={handleSubmit} className="space-y-4">

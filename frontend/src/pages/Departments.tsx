@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import type { AxiosError } from 'axios';
 import { departmentsAPI } from '../api';
-import { Trash2 } from 'lucide-react';
+import { Trash2, Building, AlertCircle } from 'lucide-react';
 
 interface Department {
   department_id: number;
@@ -146,7 +146,7 @@ export const Departments: React.FC = () => {
       <div className="bg-white rounded-xl shadow-sm overflow-hidden">
         <div className="p-6 border-b border-gray-200">
           <h2 className="text-lg font-bold text-gray-900 flex items-center gap-2">
-            <span>🏢</span>
+            <Building size={20} />
             All Departments ({departments.length})
           </h2>
         </div>
@@ -156,7 +156,7 @@ export const Departments: React.FC = () => {
           </div>
         ) : departments.length === 0 ? (
           <div className="p-12 text-center text-gray-500">
-            <div className="text-5xl mb-4">📭</div>
+            <AlertCircle size={48} className="mx-auto text-gray-400 mb-4" />
             <div className="font-medium">No departments yet</div>
             <div className="text-sm mt-1">Add your first department to get started</div>
           </div>

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import type { AxiosError } from 'axios';
 import { roomsAPI } from '../api';
-import { Plus, Trash2, DoorOpen } from 'lucide-react';
+import { Plus, Trash2, DoorOpen, MapPin, Users, Monitor, Film } from 'lucide-react';
 
 interface Room {
   room_id: number;
@@ -136,7 +136,7 @@ export const Rooms: React.FC = () => {
       {/* Add Form */}
       <div className="bg-white rounded-xl shadow-sm p-6">
         <h2 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
-          <span>➕</span>
+          <Plus size={20} />
           Add New Room
         </h2>
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -282,17 +282,17 @@ export const Rooms: React.FC = () => {
 
               <div className="space-y-2 text-sm">
                 <div className="flex justify-between text-gray-600">
-                  <span>📍 {room.block_name} - Floor {room.floor_number}</span>
+                  <span className="flex items-center gap-2"><MapPin size={16} /> {room.block_name} - Floor {room.floor_number}</span>
                 </div>
                 <div className="flex justify-between text-gray-600">
-                  <span>👥 Capacity: {room.capacity}</span>
+                  <span className="flex items-center gap-2"><Users size={16} /> Capacity: {room.capacity}</span>
                 </div>
                 {room.computer_count > 0 && (
-                  <div className="text-gray-600">💻 {room.computer_count} Computers</div>
+                  <div className="text-gray-600 flex items-center gap-2"><Monitor size={16} /> {room.computer_count} Computers</div>
                 )}
                 <div className="flex gap-2 mt-2">
                   {room.has_projector && (
-                    <span className="bg-blue-100 text-blue-700 px-2 py-1 rounded text-xs">📽️ Projector</span>
+                    <span className="bg-blue-100 text-blue-700 px-2 py-1 rounded text-xs flex items-center gap-1"><Film size={14} /> Projector</span>
                   )}
                   {room.has_ac && (
                     <span className="bg-cyan-100 text-cyan-700 px-2 py-1 rounded text-xs">❄️ AC</span>
