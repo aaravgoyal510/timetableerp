@@ -16,14 +16,13 @@ export const Login: React.FC = () => {
     setIsLoading(true);
 
     try {
-      const id = parseInt(staff_id, 10);
-      if (isNaN(id)) {
+      if (!staff_id.trim()) {
         setError('Please enter a valid Staff ID');
         setIsLoading(false);
         return;
       }
 
-      await login(id, pin);
+      await login(staff_id, pin);
       navigate('/dashboard');
     } catch (err: unknown) {
       const error = err as Error;
