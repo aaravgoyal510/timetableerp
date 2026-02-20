@@ -109,7 +109,19 @@ CREATE INDEX IF NOT EXISTS idx_auth_audit_staff_id ON public.auth_audit_log(staf
 
 -- STEP 8: Insert default admin credentials (staff_id='1', PIN='1234')
 -- NOTE: Only run this if you need a default admin account for testing
+
+-- First, ensure Admin role exists in roles_master (don't force role_id=1, let it auto-assign)
+INSERT INTO public.roles_master (role_name, role_description, is_active)
+VALUES ('Admin', 'System Administrator - Full access', true)
+ON CONFLICT (role_name) DO NOTHING;
+
 -- Delete existing staff_id '1' if it exists (from old integer system)
+-- First delete dependencies, then the staff record
+DELETE FROM public.auth_credentials WHERE staff_id = '1';
+DELETE FROM public.auth_sessions WHERE staff_id = '1';
+DELETE FROM public.staff_role_map WHERE staff_id = '1';
+DELETE FROM public.staff_dept_map WHERE staff_id = '1';
+DELETE FROM public.teacher_subject_map WHERE staff_id = '1';
 DELETE FROM public.staff WHERE staff_id = '1';
 
 -- Insert admin staff record
@@ -122,9 +134,9 @@ ON CONFLICT (staff_id) DO UPDATE SET
   staff_type = EXCLUDED.staff_type,
   is_active = EXCLUDED.is_active;
 
--- Assign Admin role (assuming role_id 1 is Admin)
+-- Assign Admin role (get the role_id dynamically)
 INSERT INTO public.staff_role_map (staff_id, role_id)
-VALUES ('1', 1)
+SELECT '1', role_id FROM public.roles_master WHERE role_name = 'Admin' LIMIT 1
 ON CONFLICT (staff_id, role_id) DO NOTHING;
 
 -- Insert auth credentials with bcrypt-hashed PIN '1234'

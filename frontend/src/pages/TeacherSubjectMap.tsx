@@ -3,24 +3,20 @@ import type { AxiosError } from 'axios';
 import { api } from '../api';
 
 interface TeacherSubjectMapping {
-  teacher_subject_map_id: number;
-  staff_id: number;
-  subject_id: number;
+  staff_id: string;  // VARCHAR
+  subject_code: string;  // VARCHAR
   staff_name?: string;
   subject_name?: string;
-  subject_code?: string;
-  is_active: boolean;
 }
 
 interface Staff {
-  staff_id: number;
+  staff_id: string;  // VARCHAR
   staff_name: string;
 }
 
 interface Subject {
-  subject_id: number;
+  subject_code: string;  // Primary key
   subject_name: string;
-  subject_code: string;
 }
 
 export const TeacherSubjectMap: React.FC = () => {
@@ -31,8 +27,7 @@ export const TeacherSubjectMap: React.FC = () => {
   const [showForm, setShowForm] = useState(false);
   const [formData, setFormData] = useState({
     staff_id: '',
-    subject_id: '',
-    is_active: true
+    subject_code: ''
   });
 
   useEffect(() => {
@@ -61,8 +56,11 @@ export const TeacherSubjectMap: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      await api.post('/teacher-subject-map', formData);
-      setFormData({ staff_id: '', subject_id: '', is_active: true });
+      await api.post('/teacher-subject-map', {
+        staff_id: formData.staff_id,
+        subject_code: formData.subject_code
+      });
+      setFormData({ staff_id: '', subject_code: '' });
       setShowForm(false);
       fetchData();
     } catch (error: unknown) {
@@ -73,10 +71,11 @@ export const TeacherSubjectMap: React.FC = () => {
     }
   };
 
-  const handleDelete = async (id: number) => {
+  const handleDelete = async (staffId: string, subjectCode: string) => {
     if (confirm('Are you sure?')) {
       try {
-        await api.delete(`/teacher-subject-map/${id}`);
+        // Use composite key format: staff_id_subject_code
+        await api.delete(`/teacher-subject-map/${staffId}_${subjectCode}`);
         fetchData();
       } catch (error) {
         console.error('Error deleting mapping:', error);
@@ -117,14 +116,14 @@ export const TeacherSubjectMap: React.FC = () => {
           <div>
             <label className="block text-sm font-medium text-gray-700">Subject</label>
             <select
-              value={formData.subject_id}
-              onChange={(e) => setFormData({ ...formData, subject_id: e.target.value })}
+              value={formData.subject_code}
+              onChange={(e) => setFormData({ ...formData, subject_code: e.target.value })}
               className="mt-1 block w-full border-gray-300 rounded-md shadow-sm border px-3 py-2"
               required
             >
               <option value="">Select Subject</option>
               {subjects.map(s => (
-                <option key={s.subject_id} value={s.subject_id}>{s.subject_name} ({s.subject_code})</option>
+                <option key={s.subject_code} value={s.subject_code}>{s.subject_name} ({s.subject_code})</option>
               ))}
             </select>
           </div>
@@ -142,24 +141,18 @@ export const TeacherSubjectMap: React.FC = () => {
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Teacher Name</th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Subject</th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Subject Code</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Actions</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-200">
             {mappings.map(mapping => (
-              <tr key={mapping.teacher_subject_map_id} className="hover:bg-gray-50">
-                <td className="px-6 py-4 text-sm text-gray-900">{mapping.staff_name}</td>
+              <tr key={`${mapping.staff_id}_${mapping.subject_code}`} className="hover:bg-gray-50">
+                <td className="px-6 py-4 text-sm text-gray-900">{mapping.staff_name || mapping.staff_id}</td>
                 <td className="px-6 py-4 text-sm text-gray-900">{mapping.subject_name}</td>
                 <td className="px-6 py-4 text-sm text-gray-900">{mapping.subject_code}</td>
                 <td className="px-6 py-4 text-sm">
-                  <span className={`px-2 py-1 rounded text-white text-xs ${mapping.is_active ? 'bg-green-600' : 'bg-red-600'}`}>
-                    {mapping.is_active ? 'Active' : 'Inactive'}
-                  </span>
-                </td>
-                <td className="px-6 py-4 text-sm">
                   <button
-                    onClick={() => handleDelete(mapping.teacher_subject_map_id)}
+                    onClick={() => handleDelete(mapping.staff_id, mapping.subject_code)}
                     className="text-red-600 hover:text-red-900"
                   >
                     Delete

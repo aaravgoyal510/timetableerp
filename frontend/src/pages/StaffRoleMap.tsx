@@ -4,14 +4,14 @@ import { api } from '../api';
 
 interface StaffRoleMapping {
   staff_role_map_id: number;
-  staff_id: number;
+  staff_id: string;  // VARCHAR
   role_id: number;
   staff_name?: string;
   role_name?: string;
 }
 
 interface Staff {
-  staff_id: number;
+  staff_id: string;  // VARCHAR
   staff_name: string;
 }
 

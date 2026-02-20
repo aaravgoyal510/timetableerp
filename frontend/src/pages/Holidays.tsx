@@ -45,7 +45,11 @@ export const Holidays: React.FC = () => {
     
     try {
       setSubmitting(true);
-      await holidaysAPI.create(formData);
+      // Only send holiday_date and holiday_name (backend doesn't accept description)
+      await holidaysAPI.create({
+        holiday_date: formData.holiday_date,
+        holiday_name: formData.holiday_name
+      });
       
       setSuccess('Holiday added successfully!');
       setFormData({

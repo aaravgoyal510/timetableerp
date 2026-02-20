@@ -4,10 +4,10 @@ import type { Student, Class, Subject, Staff, Timeslot } from '../types';
 
 interface Attendance {
   attendance_id?: number;
-  student_id: number;
+  student_id: string;  // VARCHAR
   class_id: number;
   subject_code: string;
-  staff_id: number;
+  staff_id: string;  // VARCHAR
   timeslot_id: number;
   attendance_date: string;
   status: string;

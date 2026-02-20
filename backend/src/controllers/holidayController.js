@@ -2,8 +2,8 @@ const supabase = require('../config/supabase');
 
 // Mock data for when Supabase is unavailable
 const MOCK_HOLIDAYS = [
-  { holiday_id: 1, holiday_name: 'Republic Day', holiday_date: '2024-01-26', description: 'National Holiday' },
-  { holiday_id: 2, holiday_name: 'Independence Day', holiday_date: '2024-08-15', description: 'National Holiday' },
+  { holiday_id: 1, holiday_name: 'Republic Day', holiday_date: '2024-01-26' },
+  { holiday_id: 2, holiday_name: 'Independence Day', holiday_date: '2024-08-15' },
 ];
 
 const getAllHolidays = async (req, res) => {
@@ -30,7 +30,7 @@ const getHolidayById = async (req, res) => {
 
 const createHoliday = async (req, res) => {
   try {
-    const { holiday_date, holiday_name, description } = req.body;
+    const { holiday_date, holiday_name } = req.body;
     
     // Validation
     if (!holiday_date || !holiday_date.trim()) {
@@ -46,8 +46,7 @@ const createHoliday = async (req, res) => {
     const { data, error } = await supabase.from('holidays').insert([
       {
         holiday_date,
-        holiday_name: holiday_name.trim(),
-        description: description?.trim() || ''
+        holiday_name: holiday_name.trim()
       }
     ]).select();
     if (error) throw error;

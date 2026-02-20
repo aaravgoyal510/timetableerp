@@ -63,7 +63,7 @@ api.interceptors.response.use(
 
 // Auth API
 export const authAPI = {
-  login: (staff_id: number, pin: string) => {
+  login: (staff_id: string, pin: string) => {
     const authClient = axios.create({
       baseURL: API_BASE_URL,
       headers: { 'Content-Type': 'application/json' },

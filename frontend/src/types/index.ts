@@ -8,7 +8,7 @@ export interface ApiResponse<T> {
 
 // Student
 export interface Student {
-  student_id?: number;
+  student_id?: string;  // VARCHAR
   roll_number: string;
   student_name: string;
   email: string;
@@ -21,7 +21,7 @@ export interface Student {
 
 // Staff
 export interface Staff {
-  staff_id?: number;
+  staff_id?: string;  // VARCHAR
   staff_name: string;
   email: string;
   phone_number: string;

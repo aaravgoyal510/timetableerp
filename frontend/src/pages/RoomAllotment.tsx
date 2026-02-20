@@ -6,7 +6,7 @@ interface RoomAllotment {
   booking_id?: number;
   room_id: number;
   class_id: number;
-  staff_id: number;
+  staff_id: string;  // VARCHAR
   subject_code: string;
   timeslot_id: number;
   allotment_date: string;

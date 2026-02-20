@@ -2,8 +2,8 @@ const supabase = require('../config/supabase');
 
 // Mock data
 const MOCK_STUDENT_ROLE_MAP = [
-  { student_role_map_id: 1, student_id: 1, role_id: 3, student_name: 'Aarav Goyal', role_name: 'Student', is_active: true },
-  { student_role_map_id: 2, student_id: 2, role_id: 3, student_name: 'Priya Sharma', role_name: 'Student', is_active: true },
+  { student_id: 1, role_id: 3, student_name: 'Aarav Goyal', role_name: 'Student' },
+  { student_id: 2, role_id: 3, student_name: 'Priya Sharma', role_name: 'Student' },
 ];
 
 const getAllStudentRoleMap = async (req, res) => {
@@ -20,7 +20,7 @@ const getAllStudentRoleMap = async (req, res) => {
 const getStudentRoleMapById = async (req, res) => {
   try {
     const { id } = req.params;
-    const { data, error } = await supabase.from('student_role_map').select('*').eq('student_role_map_id', id);
+    const { data, error } = await supabase.from('student_role_map').select('*').eq('student_id', id);
     if (error) throw error;
     res.status(200).json(data[0] || {});
   } catch (error) {
@@ -30,12 +30,11 @@ const getStudentRoleMapById = async (req, res) => {
 
 const createStudentRoleMap = async (req, res) => {
   try {
-    const { student_id, role_id, is_active } = req.body;
+    const { student_id, role_id } = req.body;
     const { data, error } = await supabase.from('student_role_map').insert([
       {
         student_id,
-        role_id,
-        is_active: is_active !== undefined ? is_active : true
+        role_id
       }
     ]).select();
     if (error) throw error;
@@ -48,7 +47,7 @@ const createStudentRoleMap = async (req, res) => {
 const updateStudentRoleMap = async (req, res) => {
   try {
     const { id } = req.params;
-    const { data, error } = await supabase.from('student_role_map').update(req.body).eq('student_role_map_id', id).select();
+    const { data, error } = await supabase.from('student_role_map').update(req.body).eq('student_id', id).select();
     if (error) throw error;
     res.status(200).json(data[0]);
   } catch (error) {
@@ -59,7 +58,7 @@ const updateStudentRoleMap = async (req, res) => {
 const deleteStudentRoleMap = async (req, res) => {
   try {
     const { id } = req.params;
-    const { data, error } = await supabase.from('student_role_map').delete().eq('student_role_map_id', id).select();
+    const { error } = await supabase.from('student_role_map').delete().eq('student_id', id);
     if (error) throw error;
     res.status(200).json({ message: 'Mapping deleted successfully' });
   } catch (error) {

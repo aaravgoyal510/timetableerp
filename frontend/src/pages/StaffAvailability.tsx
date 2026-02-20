@@ -4,7 +4,7 @@ import { Plus, Calendar } from 'lucide-react';
 
 interface StaffAvailability {
   availability_id: number;
-  staff_id: number;
+  staff_id: string;  // VARCHAR
   timeslot_id: number;
   is_recurring: boolean;
   day_of_week?: string;
@@ -14,7 +14,7 @@ interface StaffAvailability {
 }
 
 interface Staff {
-  staff_id: number;
+  staff_id: string;  // VARCHAR
   staff_name: string;
 }
 

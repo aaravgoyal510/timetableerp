@@ -3,16 +3,14 @@ import type { AxiosError } from 'axios';
 import { api } from '../api';
 
 interface StudentRoleMapping {
-  student_role_map_id: number;
-  student_id: number;
+  student_id: string;  // VARCHAR (primary key)
   role_id: number;
   student_name?: string;
   role_name?: string;
-  is_active: boolean;
 }
 
 interface Student {
-  student_id: number;
+  student_id: string;  // VARCHAR
   student_name: string;
 }
 
@@ -29,8 +27,7 @@ export const StudentRoleMap: React.FC = () => {
   const [showForm, setShowForm] = useState(false);
   const [formData, setFormData] = useState({
     student_id: '',
-    role_id: '',
-    is_active: true
+    role_id: ''
   });
 
   useEffect(() => {
@@ -59,8 +56,11 @@ export const StudentRoleMap: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      await api.post('/student-role-map', formData);
-      setFormData({ student_id: '', role_id: '', is_active: true });
+      await api.post('/student-role-map', {
+        student_id: formData.student_id,
+        role_id: parseInt(formData.role_id)
+      });
+      setFormData({ student_id: '', role_id: '' });
       setShowForm(false);
       fetchData();
     } catch (error: unknown) {
@@ -71,10 +71,11 @@ export const StudentRoleMap: React.FC = () => {
     }
   };
 
-  const handleDelete = async (id: number) => {
+  const handleDelete = async (studentId: string) => {
     if (confirm('Are you sure?')) {
       try {
-        await api.delete(`/student-role-map/${id}`);
+        // Use student_id as primary key
+        await api.delete(`/student-role-map/${studentId}`);
         fetchData();
       } catch (error) {
         console.error('Error deleting mapping:', error);
@@ -139,23 +140,17 @@ export const StudentRoleMap: React.FC = () => {
             <tr>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Student Name</th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Role</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Actions</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-200">
             {mappings.map(mapping => (
-              <tr key={mapping.student_role_map_id} className="hover:bg-gray-50">
-                <td className="px-6 py-4 text-sm text-gray-900">{mapping.student_name}</td>
+              <tr key={mapping.student_id} className="hover:bg-gray-50">
+                <td className="px-6 py-4 text-sm text-gray-900">{mapping.student_name || mapping.student_id}</td>
                 <td className="px-6 py-4 text-sm text-gray-900">{mapping.role_name}</td>
                 <td className="px-6 py-4 text-sm">
-                  <span className={`px-2 py-1 rounded text-white text-xs ${mapping.is_active ? 'bg-green-600' : 'bg-red-600'}`}>
-                    {mapping.is_active ? 'Active' : 'Inactive'}
-                  </span>
-                </td>
-                <td className="px-6 py-4 text-sm">
                   <button
-                    onClick={() => handleDelete(mapping.student_role_map_id)}
+                    onClick={() => handleDelete(mapping.student_id)}
                     className="text-red-600 hover:text-red-900"
                   >
                     Delete

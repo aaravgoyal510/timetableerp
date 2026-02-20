@@ -20,7 +20,9 @@ const getAllTeacherSubjectMap = async (req, res) => {
 const getTeacherSubjectMapById = async (req, res) => {
   try {
     const { id } = req.params;
-    const { data, error } = await supabase.from('teacher_subject_map').select('*').eq('teacher_subject_map_id', id);
+    // Parse composite key: id should be "staffId_subjectCode"
+    const [staff_id, subject_code] = id.split('_');
+    const { data, error } = await supabase.from('teacher_subject_map').select('*').eq('staff_id', staff_id).eq('subject_code', subject_code);
     if (error) throw error;
     res.status(200).json(data[0] || {});
   } catch (error) {
@@ -47,7 +49,8 @@ const createTeacherSubjectMap = async (req, res) => {
 const updateTeacherSubjectMap = async (req, res) => {
   try {
     const { id } = req.params;
-    const { data, error } = await supabase.from('teacher_subject_map').update(req.body).eq('teacher_subject_map_id', id).select();
+    const [staff_id, subject_code] = id.split('_');
+    const { data, error } = await supabase.from('teacher_subject_map').update(req.body).eq('staff_id', staff_id).eq('subject_code', subject_code).select();
     if (error) throw error;
     res.status(200).json(data[0]);
   } catch (error) {
@@ -58,7 +61,8 @@ const updateTeacherSubjectMap = async (req, res) => {
 const deleteTeacherSubjectMap = async (req, res) => {
   try {
     const { id } = req.params;
-    const { data, error } = await supabase.from('teacher_subject_map').delete().eq('teacher_subject_map_id', id).select();
+    const [staff_id, subject_code] = id.split('_');
+    const { error } = await supabase.from('teacher_subject_map').delete().eq('staff_id', staff_id).eq('subject_code', subject_code);
     if (error) throw error;
     res.status(200).json({ message: 'Mapping deleted successfully' });
   } catch (error) {

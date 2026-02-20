@@ -7,7 +7,7 @@ interface Timetable {
   timetable_id?: number;
   class_id: number;
   subject_code: string;
-  staff_id: number;
+  staff_id: string;  // VARCHAR
   room_id: number;
   timeslot_id: number;
   timetable_date: string;

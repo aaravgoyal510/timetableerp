@@ -2,7 +2,7 @@ import React, { createContext, useContext, ReactNode, useEffect, useState } from
 import { authAPI } from '../api';
 
 interface Staff {
-  staff_id: number;
+  staff_id: string;  // VARCHAR
   staff_name: string;
   email: string;
   designation?: string;
@@ -13,7 +13,7 @@ interface AuthContextType {
   staff: Staff | null;
   isAuthenticated: boolean;
   isLoading: boolean;
-  login: (staff_id: number, pin: string) => Promise<void>;
+  login: (staff_id: string, pin: string) => Promise<void>;
   logout: () => Promise<void>;
   hasRole: (role: string | string[]) => boolean;
 }
@@ -69,7 +69,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     initializeAuth();
   }, []);
 
-  const login = async (staff_id: number, pin: string) => {
+  const login = async (staff_id: string, pin: string) => {
     try {
       const response = await authAPI.login(staff_id, pin);
       

@@ -4,13 +4,13 @@ import { staffDeptMapAPI, staffAPI, departmentsAPI } from '../api';
 
 interface StaffDeptMap {
   staff_dept_map_id: number;
-  staff_id: number;
+  staff_id: string;  // VARCHAR
   department_id: number;
   is_active: boolean;
 }
 
 interface Staff {
-  staff_id: number;
+  staff_id: string;  // VARCHAR
   staff_name: string;
 }
 
@@ -62,7 +62,7 @@ export const StaffDeptMap: React.FC = () => {
     
     try {
       await staffDeptMapAPI.create({
-        staff_id: Number(formData.staff_id),
+        staff_id: formData.staff_id,
         department_id: Number(formData.department_id),
         is_active: formData.is_active
       });
